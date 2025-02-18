@@ -2,7 +2,7 @@ require('dotenv').config();
 
 const express = require("express");
 const app = express();
-const router = require("./router/auth-router.js");
+const router = require("./router");
 const { connectDb } = require("./config/db");
 
 
@@ -11,7 +11,7 @@ app.use(express.json());
 
 /* mount the router: to use the router in your main Express app, 
  you can "mount" it at a specific URL prefix */
-app.use("/api/auth", router);
+app.use("/api", router);
 
 
 const PORT = 5000;
