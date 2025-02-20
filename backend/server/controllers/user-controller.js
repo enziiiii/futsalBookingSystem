@@ -1,3 +1,5 @@
+// import { updateUser } from "../models/user-model";
+
 const pool = require("../config/db");
 
 // Standardized response function
@@ -9,8 +11,70 @@ const handleResponse = (res, status, message, data = null) => {
     });
 };
 
+// Create a new user
+const createUserController = async (req, res, next) => {
+    const { username, email, passwordHash, fullName, phone } = req.body;
+    try {
+        const newUser = await createUser(username, email, passwordHash, fullName, phone);
+        handleResponse(res, 201, "user created successfully", newUser)
+    } catch (err) {
+        next(err);
+    }
+};
 
-// // Create a new user
+const getAllUsersController = async (req, res, next) => {
+    try{
+        const users = await getAllUsers(req.params.user_id);
+        if (!user) return handleResponse(res, 404, "User not found");
+        handleResponse(res, 200, "User fetch successfully", user);
+    } catch (err) {
+        next(err);
+    }
+};
+
+// Get user by ID
+const getUserByIdController = async (req, res) => {
+  const { user_id } = req.params;
+  try {
+    const result = await pool.query(`SELECT * FROM users WHERE id = $1`, [user_id]);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.status(200).json({ user: result.rows[0] });
+  } catch (error) {
+    res.status(500).json({ message: "Error retrieving user", error: error.message });
+  }
+};
+
+const updateUserController = async (req, res, next) => {
+    const { username, email } = req.body;
+    try {
+        const updatedUser = await updateUser(req.params.user_id, username, email);
+        if (!user) return handleResponse(res, 404, "User not found");
+        handleResponse(res, 200, "User updated successfully", updatedUser);
+    } catch (err) {
+        next(err);
+    }
+};
+
+const deleteUserController = async (req, res, next) => {
+    try {
+        const deletedUser = await deleteUser(req.params.user_id);
+        if (!user) return handleResponse(res, 404, "User not found");
+        handleResponse(res, 200, "User deleted successfully", deleteUserController)
+    } catch (err) {
+        next(err);
+    }
+};
+
+module.exports = { createUserController,
+    getAllUsersController,
+    getUserByIdController,
+    updateUserController,
+    deleteUserController
+ }
+
+// Create a new user
 // exports.createUser = async (req, res) => {
 //   const { first_name, last_name, email, password } = req.body;
 //   try {
