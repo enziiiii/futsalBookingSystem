@@ -1,6 +1,6 @@
-// import { updateUser } from "../models/user-model";
-
 const pool = require("../config/db");
+
+const  { getAllUsers } = require("../models/user-model");
 
 // Standardized response function
 const handleResponse = (res, status, message, data = null) => {
@@ -24,9 +24,8 @@ const createUserController = async (req, res, next) => {
 
 const getAllUsersController = async (req, res, next) => {
     try{
-        const users = await getAllUsers(req.params.user_id);
-        if (!user) return handleResponse(res, 404, "User not found");
-        handleResponse(res, 200, "User fetch successfully", user);
+        const users = await getAllUsers();
+        handleResponse(res, 200, "User fetch successfully", users);
     } catch (err) {
         next(err);
     }
@@ -34,9 +33,9 @@ const getAllUsersController = async (req, res, next) => {
 
 // Get user by ID
 const getUserByIdController = async (req, res) => {
-  const { user_id } = req.params;
+  const { id } = req.params;
   try {
-    const result = await pool.query(`SELECT * FROM users WHERE id = $1`, [user_id]);
+    const result = await pool.query(`SELECT * FROM users WHERE User_id = $1`, [id]);
     if (result.rows.length === 0) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -49,7 +48,7 @@ const getUserByIdController = async (req, res) => {
 const updateUserController = async (req, res, next) => {
     const { username, email } = req.body;
     try {
-        const updatedUser = await updateUser(req.params.user_id, username, email);
+        const updatedUser = await updateUser(req.params.id, username, email);
         if (!user) return handleResponse(res, 404, "User not found");
         handleResponse(res, 200, "User updated successfully", updatedUser);
     } catch (err) {
@@ -59,7 +58,7 @@ const updateUserController = async (req, res, next) => {
 
 const deleteUserController = async (req, res, next) => {
     try {
-        const deletedUser = await deleteUser(req.params.user_id);
+        const deletedUser = await deleteUser(req.params.id);
         if (!user) return handleResponse(res, 404, "User not found");
         handleResponse(res, 200, "User deleted successfully", deleteUserController)
     } catch (err) {
