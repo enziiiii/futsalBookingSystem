@@ -1,6 +1,7 @@
 const pool = require("../config/db");
 
-const  { getAllUsers } = require("../models/user-model");
+// const  { allModels } = require("../models");
+const { allModels } = require("../models");
 
 // Standardized response function
 const handleResponse = (res, status, message, data = null) => {
