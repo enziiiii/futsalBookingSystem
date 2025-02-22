@@ -19,13 +19,13 @@ const startPool = () => {
             process.exit(-1);
         });
         
-        return pool;
-        
     }
-}
+    return pool;
+        
+};
 
 // Initialize the pool once
-startPool();
+// pool = startPool();
 
 /* // Database connection configuration
 const pool = new Pool({
@@ -61,4 +61,4 @@ const connectDb = async () => {
     }
 };
 
-module.exports = { pool, connectDb };
+module.exports = { pool: startPool(), connectDb };
