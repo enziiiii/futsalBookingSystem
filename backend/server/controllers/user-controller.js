@@ -1,6 +1,5 @@
-const pool = require("../config/db");
+const { pool }  = require("../config/db");
 
-// const  { allModels } = require("../models");
 const { allModels } = require("../models");
 
 // Standardized response function
@@ -14,9 +13,10 @@ const handleResponse = (res, status, message, data = null) => {
 
 // Create a new user
 const createUserController = async (req, res, next) => {
-    const { username, email, passwordHash, fullName, phone } = req.body;
+    console.log("Request body: ", req.body);
+    const { username, fullName,  email, passwordHash, phoneNumber } = req.body;
     try {
-        const newUser = await createUser(username, email, passwordHash, fullName, phone);
+        const newUser = await allModels.userModel.createUser(username, fullName, email, passwordHash, phoneNumber);
         handleResponse(res, 201, "user created successfully", newUser)
     } catch (err) {
         next(err);
@@ -34,9 +34,9 @@ const getAllUsersController = async (req, res, next) => {
 
 // Get user by ID
 const getUserByIdController = async (req, res) => {
-  const { id } = req.params;
+  const { userId } = req.params;
   try {
-    const result = await pool.query(`SELECT * FROM users WHERE User_id = $1`, [id]);
+    const result = await pool.query(`SELECT * FROM users WHERE user_id = $1`, [userId]);
     if (result.rows.length === 0) {
       return res.status(404).json({ message: "User not found" });
     }
