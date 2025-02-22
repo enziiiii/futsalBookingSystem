@@ -5,8 +5,7 @@ const app = express();
 const router = require("./router/allRouter");
 const { connectDb } = require("./config/db");
 const errorHandling = require('./middlewares/errorHandler');
-const createUserTable = require('./db/createUserTable');
-
+const initializeSchemaTable = require('./db/AllTable');
 
 
 // middle-ware to parse JSON
@@ -32,7 +31,7 @@ async function startServer() {
         if (!isConnected) throw new Error('Database connection failed');
 
         // Create tables
-        await createUserTable();
+        await initializeSchemaTable();
 
         // start the server
         app.listen(PORT, () => {
