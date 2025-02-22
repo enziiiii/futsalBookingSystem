@@ -14,22 +14,13 @@ const createUserTable = async () => {
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )
     `;
-    const client = await pool.connect();
-
     try {
-        await client.query("BEGIN"); 
-
         await pool.query(queryText);
-
-        await client.query("COMMIT");
         console.log("User table created if not exists");
     } catch (error) {
-        await client.query("ROLLBACK");
         console.log("Error creating users table : ", error);
         throw error;
-    } finally {
-        client.release();
-    }
+    } 
 };
 
 module.exports = createUserTable;
