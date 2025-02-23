@@ -25,7 +25,7 @@ const createUserController = async (req, res, next) => {
 
 const getAllUsersController = async (req, res, next) => {
     try{
-        const users = await getAllUsers();
+        const users = await allModels.userModel.getAllUsers();
         handleResponse(res, 200, "User fetch successfully", users);
     } catch (err) {
         next(err);
@@ -38,19 +38,24 @@ const getUserByIdController = async (req, res) => {
   try {
     const result = await pool.query(`SELECT * FROM users WHERE user_id = $1`, [userId]);
     if (result.rows.length === 0) {
-      return res.status(404).json({ message: "User not found" });
+        return handleResponse(res, 404, "User not found");
     }
-    res.status(200).json({ user: result.rows[0] });
-  } catch (error) {
-    res.status(500).json({ message: "Error retrieving user", error: error.message });
+    handleResponse(res, 200, "User fetched sucessfully", result.rows[0]);
+  } catch (err) {
+    next(err);
   }
 };
 
 const updateUserController = async (req, res, next) => {
-    const { username, email } = req.body;
+    // const { username, email } = req.body;
+    const userId = parseInt(req.params.userId, 10);
+    if (isNaN(userId)) {
+        return handleResponse(res, 400, "invalid user Id");
+    }
+
     try {
-        const updatedUser = await updateUser(req.params.id, username, email);
-        if (!user) return handleResponse(res, 404, "User not found");
+        const updatedUser = await allModels.userModel.updateUser(userId, req.body);
+        if (!updatedUser) return handleResponse(res, 404, "User not found");
         handleResponse(res, 200, "User updated successfully", updatedUser);
     } catch (err) {
         next(err);
@@ -58,9 +63,13 @@ const updateUserController = async (req, res, next) => {
 };
 
 const deleteUserController = async (req, res, next) => {
+    const userId = parseInt(req.params.userId, 10);
+    if (isNaN(userId)) {
+        return handleResponse(res, 400, "Invalid user ID");
+    }
     try {
-        const deletedUser = await deleteUser(req.params.id);
-        if (!user) return handleResponse(res, 404, "User not found");
+        const deletedUser = await allModels.userModel.deleteUser(req.params.userId);
+        if (!deletedUser) return handleResponse(res, 404, "User not found");
         handleResponse(res, 200, "User deleted successfully", deleteUserController)
     } catch (err) {
         next(err);
