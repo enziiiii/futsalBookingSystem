@@ -42,20 +42,37 @@ const getUserByEmailWithRoles = async (email) => {
 };
 
 // update user
-const allowedFields = ["username", "email"]; 
+const allowedFields = ["username", "fullName", "email", "passwordHash", "phoneNumber"]; 
 const updateUser = async (userId, updates) => {
   const fields = [];
   const values = [];
   let counter = 1;
 
   for (const [key, value] of Object.entries(updates)) {
-    if (!allowedFields.includes(key)) { // Validate keys
+    // Validate field namses and values
+    if (!allowedFields.includes(key)) { 
       throw new Error(`Invalid field: ${key}`);
     }
-    fields.push(`${key} = $${counter}`);
+    if (value === undefined || value === null) {
+      throw new Error(`Field "${key}" cannot be empty`);
+    }
+    
+    // mapping to database column
+    /* we can write  like this:
+    const dbColumn = key === "fullName" ? "full_name" : key;
+    */
+    const dbColumn = key.replace(/([A-Z])/g, "_$1").toLowerCase();
+
+    fields.push(`${dbColumn} = $${counter}`);
     values.push(value);
     counter++;
   }
+
+  if (fields.length === 0) {
+    throw new Error("No valid fields to update");
+  }
+
+  values.push(userId);
 
   const query = `
     UPDATE users
@@ -63,16 +80,19 @@ const updateUser = async (userId, updates) => {
     WHERE user_id = $${counter}
     RETURNING *
   `;
-  values.push(userId);
 
   const result = await pool.query(query, values);
+  if (result.rowCount === 0) {
+    throw new Error("User not found");
+  }
+
   return result.rows[0]; // Return the updated row directly
 };
 
-const deleteUser = async (user_id) => {
+const deleteUser = async (userId) => {
   const result = await pool.query(
     "DELETE FROM users WHERE user_id = $1 RETURNING *",
-    [user_id]
+    [userId]
   );
   return result.rows[0];
 };
