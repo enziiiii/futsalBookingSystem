@@ -14,9 +14,9 @@ const handleResponse = (res, status, message, data = null) => {
 // Create a new user
 const createUserController = async (req, res, next) => {
     console.log("Request body: ", req.body);
-    const { username, fullName,  email, passwordHash, phoneNumber } = req.body;
+    const { username, fullName,  email, password, phoneNumber } = req.body;
     try {
-        const newUser = await allModels.userModel.createUser(username, fullName, email, passwordHash, phoneNumber);
+        const newUser = await allModels.userModel.createUser(username, fullName, email, password, phoneNumber);
         handleResponse(res, 201, "user created successfully", newUser)
     } catch (err) {
         next(err);
@@ -68,15 +68,16 @@ const deleteUserController = async (req, res, next) => {
         return handleResponse(res, 400, "Invalid user ID");
     }
     try {
-        const deletedUser = await allModels.userModel.deleteUser(req.params.userId);
-        if (!deletedUser) return handleResponse(res, 404, "User not found");
-        handleResponse(res, 200, "User deleted successfully", deleteUserController)
+        const deletedUser = await allModels.userModel.deleteUser(userId);
+        // if (!deletedUser) return handleResponse(res, 404, "User not found");
+        handleResponse(res, 200, "User deleted successfully", deletedUser);
     } catch (err) {
         next(err);
     }
 };
 
-module.exports = { createUserController,
+module.exports = { 
+    createUserController,
     getAllUsersController,
     getUserByIdController,
     updateUserController,
