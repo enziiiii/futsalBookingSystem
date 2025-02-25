@@ -1,5 +1,5 @@
-const bcrypt = require("bcrypt");
-const { allModels } = require("../models");
+const handleResponse = require("../utils/handleResponse");
+const authService = require("../services/authService");
 
 
 // *--Home page Logic ------
@@ -15,7 +15,26 @@ const home = async (req, res) => {
     }
 };
 
+// *--Signup logic------
+// --this way some logic are in services and some are here--//
+const register = async (req, res) => {
+    try {
+        const userData = req.body;
+        const result = await authService.registerUser(userData);
+        handleResponse(res, 201, "Registration successful", result);
+    } catch (error) {
+        // map service error to HTTP responses
+        if (error.message.includes("already registered")) {
+            handleResponse(res, 409, error.message);
+        } else {
+            handleResponse(res, 500, "Internal server error");
+        }
+    }
+};
 
+
+/* we can also write this way, this way is simple, everything is in auth-controller.js
+--------------------------------------------------------------------------
 // *--Signup logic------
 const register = async (req, res) => {
     try {
@@ -74,6 +93,8 @@ const register = async (req, res) => {
     //     res.status(500).json("internal server error");
     // }
 };
+----------------------------
+*/
  
 
 module.exports = {home, register};
