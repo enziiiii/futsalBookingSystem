@@ -1,12 +1,12 @@
 const { pool }  = require("../config/db");
 
-const createUser = async (username,  fullName, email, passwordHash, phoneNumber) => {
+const createUser = async (username,  fullName, email, password, phoneNumber) => {
   const query = `
     INSERT INTO users (username, full_name, email, password_hash, phone_number)
     VALUES ($1, $2, $3, $4, $5)
     RETURNING user_id, email, created_at
   `;
-  const result = await pool.query(query, [username, fullName, email, passwordHash, phoneNumber]);
+  const result = await pool.query(query, [username, fullName, email, password, phoneNumber]);
   return result.rows[0];
 };
 
@@ -17,6 +17,14 @@ const getAllUsers = async () => {
 
 const getUserById = async (userId) => {
   const result = await pool.query("SELECT * FROM users WHERE user_id = $1", [userId]);
+  return result.rows[0];
+};
+
+const getUserByEmail = async (email) => {
+  const result = await pool.query(
+    'SELECT * FROM users WHERE email = $1',
+    [email]
+  );
   return result.rows[0];
 };
 
@@ -94,6 +102,11 @@ const deleteUser = async (userId) => {
     "DELETE FROM users WHERE user_id = $1 RETURNING *",
     [userId]
   );
+
+  if (result.rowCount === 0) {
+    throw new Error("User not found");
+  }
+
   return result.rows[0];
 };
 
@@ -177,6 +190,7 @@ module.exports = {
   createUser,
   getAllUsers,
   getUserById,
+  getUserByEmail,
   assignUserRole,
   getUserByEmailWithRoles,
   updateUser,
