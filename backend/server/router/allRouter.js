@@ -3,8 +3,8 @@
 const express = require("express");
 const router = express.Router();
 
-const authRouter = require("../auth-router.js");
-const userRouter = require("../user-router.js");
+const authRouter = require("./auth-router.js");
+const userRouter = require("./user-router.js");
 
 // Use sub-routers
 router.use("/auth", authRouter);
