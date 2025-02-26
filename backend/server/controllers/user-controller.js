@@ -1,7 +1,10 @@
 const { pool }  = require("../config/db");
 
 const { allModels } = require("../models");
+const handleResponse = require("../utils/handleResponse");
 
+
+/* -- i moved this handleResponse function to utils so everybody can access it with ease --//
 // Standardized response function
 const handleResponse = (res, status, message, data = null) => {
     res.status(status).json({
@@ -10,6 +13,7 @@ const handleResponse = (res, status, message, data = null) => {
         data,
     });
 };
+*/
 
 // Create a new user
 const createUserController = async (req, res, next) => {
