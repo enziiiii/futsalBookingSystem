@@ -1,5 +1,8 @@
 const handleResponse = require("../utils/handleResponse");
 const authService = require("../services/authService");
+const { AppError } = require("../utils/customErrors");
+const CustomErrors = require("../utils/customErrors");
+
 
 
 // *--Home page Logic ------
@@ -19,16 +22,30 @@ const home = async (req, res) => {
 // --this way some logic are in services and some are here--//
 const register = async (req, res) => {
     try {
+        console.log("Request body received:", req.body);
         const userData = req.body;
         const result = await authService.registerUser(userData);
         handleResponse(res, 201, "Registration successful", result);
     } catch (error) {
+        console.error("Registration error (original):", error.originalError || error); // Log raw error
+
+        // handle all AppError instances (ValidationError, UserAlreadyExitsError, InternalServerError)
+        if (error instanceof AppError) {
+            return handleResponse(res, error.statusCode, error.message);
+        }
+
+        handleResponse(res, 500, "Internal server error");
+
+
+
+        /* we can also do this way but i have explicitly introduce error from customError in up 
         // map service error to HTTP responses
         if (error.message.includes("already registered")) {
             handleResponse(res, 409, error.message);
         } else {
             handleResponse(res, 500, "Internal server error");
         }
+            */
     }
 };
 
@@ -64,7 +81,7 @@ const register = async (req, res) => {
             phoneNumber
         );
 
-        // respond with filtereduser data
+        // respond with filteredUser data
         handleResponse(res, 201, "Registration successfyl", {
             id: newUser.user_id,
             username: newUser.username,
