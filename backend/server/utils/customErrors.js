@@ -1,0 +1,39 @@
+class AppError extends Error {
+    constructor(message, statusCode) {
+        super(message);
+        this.statusCode = statusCode;
+        this.name = this.constructor.name; // sets error name (e.g., "AppError")
+        this.isOperational = true; // Distinguishes operational vs programmer errors
+        Error.captureStackTrace(this, this.constructor); 
+    }
+
+}
+
+class ValidationError extends AppError {
+    constructor(message = "Validation failed") {
+        super(message, 400);
+    }
+}
+
+class UserAlreadyExistsError extends AppError {
+    constructor(message = "User already exists") {
+        super(message, 409);
+    }
+}
+
+// Database Error
+class InternalServerError extends AppError {
+    constructor(message, originalError) {
+        super(message, 500); // Default to 500 status code
+        this.originalError = originalError; // capture the original DB error
+    }
+}
+
+const CustomErrors = {
+    AppError,
+    ValidationError,
+    UserAlreadyExistsError,
+    InternalServerError
+};
+
+module.exports = CustomErrors;
