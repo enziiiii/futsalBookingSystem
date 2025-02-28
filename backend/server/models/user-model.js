@@ -22,7 +22,7 @@ const getUserById = async (userId) => {
 
 const getUserByEmail = async (email) => {
   const result = await pool.query(
-    'SELECT * FROM users WHERE email = $1',
+    'SELECT email, password_hash FROM users WHERE email = $1',
     [email]
   );
   return result.rows[0];
@@ -109,6 +109,9 @@ const deleteUser = async (userId) => {
 
   return result.rows[0];
 };
+
+
+
 
 /* this is another way to CRUD model
 // Create User
