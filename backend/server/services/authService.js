@@ -1,6 +1,8 @@
 const bcrypt = require("bcrypt");
 const { allModels } = require("../models");
-const { ValidationError, UserAlreadyExistsError, InternalServerError } = require("../utils/customErrors");
+const { ValidationError, UserAlreadyExistsError, InternalServerError, UnauthorizedError } = require("../utils/customErrors");
+const { generateToken } = require("../utils/jwt");
+
 
 class AuthService {
     async registerUser({ username, fullName, email, password, phoneNumber }) {
@@ -31,7 +33,7 @@ class AuthService {
 
             // respond with filteredUser data
             return {
-            id: newUser.user_id,
+            userId: newUser.user_id,
             username: newUser.username,
             createdAt: newUser.created_at
             };
@@ -47,6 +49,32 @@ class AuthService {
                 throw new InternalServerError("Failed to create user", error);
             }
         }
+    }
+
+    async loginUser(email, password) {
+        // Validate input
+        if (!email || !password) {
+            throw new ValidationError("Email and password are required");
+        }
+
+        // Find user by email
+        const user = await allModels.userModel.getUserByEmail(email);
+        if (!user || !user.password_hash) {
+            throw new UnauthorizedError("Invaid email or password");
+        }
+
+        const isPasswordValid = await bcrypt.compare(password, user.password_hash);
+        if (!isPasswordValid){
+            throw new UnauthorizedError("Invalid email or password");
+        }
+
+        // Generate JWT token
+        const token = generateToken({
+            userId: user.user_id,
+            email: user.email,
+        });
+
+        return { token, userId: user.user_id };
     }
 }
 
