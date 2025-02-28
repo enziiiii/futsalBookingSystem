@@ -6,10 +6,14 @@ const router = require("./router/allRouter");
 const { connectDb } = require("./config/db");
 const errorHandling = require('./middlewares/errorHandler');
 const initializeSchemaTable = require('./db/AllTable');
+const cookieParser = require('cookie-parser');
 
+
+app.use(cookieParser());
 
 // middle-ware to parse JSON
 app.use(express.json());
+
 
 /* mount the router: to use the router in your main Express app, 
  you can "mount" it at a specific URL prefix */
