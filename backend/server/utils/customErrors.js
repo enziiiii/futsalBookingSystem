@@ -21,6 +21,18 @@ class UserAlreadyExistsError extends AppError {
     }
 }
 
+class UnauthorizedError extends AppError {
+    constructor(message = "Unauthorized") {
+        super(message, 401);
+    }
+}
+
+class NotFoundError extends AppError {
+    constructor(message = "Resource not found") {
+        super(message, 404);
+    }
+}
+
 // Database Error
 class InternalServerError extends AppError {
     constructor(message, originalError) {
@@ -33,6 +45,8 @@ const CustomErrors = {
     AppError,
     ValidationError,
     UserAlreadyExistsError,
+    UnauthorizedError,
+    NotFoundError,
     InternalServerError
 };
 
