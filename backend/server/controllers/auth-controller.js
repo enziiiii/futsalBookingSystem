@@ -18,6 +18,33 @@ const home = async (req, res) => {
     }
 };
 
+const login = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        const { token, userId } = await authService.loginUser(email, password);
+
+        // set token in HTTP-only cookie 
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            maxAge: 24 * 60 * 60 * 1000, // 1 day
+        });
+
+        handleResponse(res, 200, "Login successful", {
+            userId: userId,
+            token
+        });
+    } catch (error) {
+        console.error("Login error:", error);
+
+        if (error instanceof AppError) {
+            return handleResponse(res, error.statusCode, error.message);
+        }
+        handleResponse(res, 500, "Internal server error");
+    }
+};
+
+
 // *--Signup logic------
 // --this way some logic are in services and some are here--//
 const register = async (req, res) => {
@@ -114,4 +141,4 @@ const register = async (req, res) => {
 */
  
 
-module.exports = {home, register};
+module.exports = {home, login, register};
