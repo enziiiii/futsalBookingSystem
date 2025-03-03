@@ -28,25 +28,45 @@ const getUserByEmail = async (email) => {
   return result.rows[0];
 };
 
-const assignUserRole = async (userId, roleId) => {
-  const query = `
+const assignUserRole = async (userId, roleName) => {
+  const role = await db.query(
+    'SELECT role_id FROM roles WHERE role_name = $1', [roleName]);
+    if (!role.rows[0]) throw new Error('Role nor found');
+  
+  await db.query(`
     INSERT INTO user_roles (user_id, role_id)
     VALUES ($1, $2)
     ON CONFLICT DO NOTHING
-  `;
-  return pool.query(query, [userId, roleId]);
+  `, [userId, role.rows[0].role_id]);
+  // return pool.query(query, [userId, roleId]);
 };
 
 const getUserByEmailWithRoles = async (email) => {
   const query = `
-    SELECT u.*, array_agg(r.role_name) as roles
+    SELECT u.*, 
+    COALESCE(array_agg(r.role_name) FILTER (WHERE R.ROLE_NAME IS NOT NULL), '{}') as roles
     FROM users u
     LEFT JOIN user_roles ur ON u.user_id = ur.user_id
     LEFT JOIN roles r ON ur.role_id = r.role_id
     WHERE u.email = $1
     GROUP BY u.user_id
   `;
-  return pool.query(query, [email]);
+  const result = await pool.query(query, [email]);
+  return result.rows[0]; // return the first user or undefined
+};
+
+const getUserWithRolesById = async (userId) => {
+  const query = `
+    SELECT u.*, array_agg(r.role_name) as roles
+    FROM  users u
+    LEFT JOIN user_roles ur ON u.user_id = ur.user_id
+    LEFT JOIN roles r ON ur.role_id = r.rle_id
+    WHERE u.user_id = $1
+    GROUP BY u.user_id
+  `;
+
+  const result = await pool.query(query, [userId]);
+  return result.rows[0];
 };
 
 // update user
@@ -196,6 +216,7 @@ module.exports = {
   getUserByEmail,
   assignUserRole,
   getUserByEmailWithRoles,
+  getUserWithRolesById,
   updateUser,
   deleteUser
 };
