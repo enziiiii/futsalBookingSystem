@@ -28,10 +28,12 @@ const login = async (req, res) => {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
             maxAge: 24 * 60 * 60 * 1000, // 1 day
+            sameSite: "strict" // Prevent CSRF attacks
         });
 
         handleResponse(res, 200, "Login successful", {
             userId: userId,
+            // username: username,
             token
         });
     } catch (error) {
@@ -41,6 +43,19 @@ const login = async (req, res) => {
             return handleResponse(res, error.statusCode, error.message);
         }
         handleResponse(res, 500, "Internal server error");
+    }
+};
+
+const logout = async (req, res) => {
+    try {
+        res.clearCookie("token", {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict"
+        });
+        handleResponse(res, 200, "Logout succesult");
+    } catch (error) {
+        handleResponse(res, 500, "Internal Server error");
     }
 };
 
@@ -141,4 +156,4 @@ const register = async (req, res) => {
 */
  
 
-module.exports = {home, login, register};
+module.exports = {home, login, logout, register};
