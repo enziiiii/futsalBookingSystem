@@ -5,8 +5,11 @@ const app = express();
 const router = require("./router/allRouter");
 const { connectDb } = require("./config/db");
 const errorHandling = require('./middlewares/errorHandler');
-const initializeSchemaTable = require('./db/AllTable');
+
 const cookieParser = require('cookie-parser');
+const initializeSchemaTable = require('./db/AllTable');
+
+
 
 
 app.use(cookieParser());
@@ -34,7 +37,7 @@ async function startServer() {
         const isConnected = await connectDb();
         if (!isConnected) throw new Error('Database connection failed');
 
-        // Create tables
+        // Create table
         await initializeSchemaTable();
 
         // start the server
