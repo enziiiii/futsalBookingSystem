@@ -33,6 +33,12 @@ class NotFoundError extends AppError {
     }
 }
 
+class ForbiddenError extends AppError {
+    constructor(message = "Permissions not allowed") {
+        super( message, 403);
+    }
+}
+
 // Database Error
 class InternalServerError extends AppError {
     constructor(message, originalError) {
@@ -47,6 +53,7 @@ const CustomErrors = {
     UserAlreadyExistsError,
     UnauthorizedError,
     NotFoundError,
+    ForbiddenError,
     InternalServerError
 };
 
