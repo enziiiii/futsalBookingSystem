@@ -22,6 +22,9 @@ class AuthService {
             const saltRounds = 10;
             const passwordHash = await bcrypt.hash(password, saltRounds);
 
+            // Assign default 'user' role
+            await allModels.userModel.assignUserRole(newUser.user_id, 'user');
+            
             // Create user with only essential fiels
             const newUser = await allModels.userModel.createUser(
                 username,
@@ -31,10 +34,12 @@ class AuthService {
                 phoneNumber
             );  
 
+
             // respond with filteredUser data
             return {
             userId: newUser.user_id,
             username: newUser.username,
+            roles: ['user'],
             createdAt: newUser.created_at
             };
         } catch (error) {
@@ -57,8 +62,16 @@ class AuthService {
             throw new ValidationError("Email and password are required");
         }
 
+        /*
         // Find user by email
         const user = await allModels.userModel.getUserByEmail(email);
+        if (!user || !user.password_hash) {
+            throw new UnauthorizedError("Invaid email or password");
+        }
+            */
+
+        // Find user by roles
+        const user = await allModels.userModel.getUserByEmailWithRoles(email);
         if (!user || !user.password_hash) {
             throw new UnauthorizedError("Invaid email or password");
         }
@@ -72,6 +85,7 @@ class AuthService {
         const token = generateToken({
             userId: user.user_id,
             email: user.email,
+            roles: user.roles
         });
 
         return { token, userId: user.user_id };
