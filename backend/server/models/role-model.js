@@ -6,6 +6,8 @@ const getRoleByName = async (roleName) => {
   return role;
 };
 
+
+
 module.exports = {
   getRoleByName
 };
