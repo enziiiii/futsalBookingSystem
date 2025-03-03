@@ -1,5 +1,6 @@
 const { pool } = require('../config/db');
 const createRoleTable = require("./createRoleTable");
+const createUserRoleTable = require('./createUserRoleTable');
 const createUserTable = require("./createUserTable");
 
 const initializeSchemaTable = async () => {
@@ -10,6 +11,8 @@ const initializeSchemaTable = async () => {
         // Reuse modular functions
         await createUserTable(client);
         await createRoleTable(client);
+        await createUserRoleTable(client);
+    
 
         await client.query("COMMIT");
     } catch (error) {

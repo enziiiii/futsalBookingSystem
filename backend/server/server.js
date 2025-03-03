@@ -7,7 +7,8 @@ const { connectDb } = require("./config/db");
 const errorHandling = require('./middlewares/errorHandler');
 
 const cookieParser = require('cookie-parser');
-const initializeSchemaTable = require('./db/AllTable');
+// const initializeSchemaTable = require('./db/AllTable');
+
 
 
 
