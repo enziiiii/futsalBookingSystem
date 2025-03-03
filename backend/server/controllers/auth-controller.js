@@ -1,9 +1,7 @@
 const handleResponse = require("../utils/handleResponse");
 const authService = require("../services/authService");
 const { AppError } = require("../utils/customErrors");
-const CustomErrors = require("../utils/customErrors");
-
-
+const { verifyAccessToken } = require("../utils/jwt");
 
 // *--Home page Logic ------
 const home = async (req, res) => {
@@ -21,20 +19,20 @@ const home = async (req, res) => {
 const login = async (req, res) => {
     try {
         const { email, password } = req.body;
-        const { token, userId } = await authService.loginUser(email, password);
+        const { accessToken, refreshToken, userId } = await authService.loginUser(email, password);
 
-        // set token in HTTP-only cookie 
-        res.cookie("token", token, {
+        // set refresh token in HTTP-only cookie 
+        res.cookie("refreshToken", refreshToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
-            maxAge: 24 * 60 * 60 * 1000, // 1 day
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
             sameSite: "strict" // Prevent CSRF attacks
         });
 
         handleResponse(res, 200, "Login successful", {
             userId: userId,
             // username: username,
-            token
+            accessToken
         });
     } catch (error) {
         console.error("Login error:", error);
@@ -48,12 +46,20 @@ const login = async (req, res) => {
 
 const logout = async (req, res) => {
     try {
-        res.clearCookie("token", {
+        const token = req.headers.authorization?.split(' ')[1];
+        if (token) {
+            // add token to blacklist
+            const decoded = verifyAccessToken(token);
+            await authService.revokeToken(token, decoded.exp);
+        }
+
+
+        res.clearCookie("refreshToken", {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
             sameSite: "strict"
         });
-        handleResponse(res, 200, "Logout succesult");
+        handleResponse(res, 200, "Logout successfull");
     } catch (error) {
         handleResponse(res, 500, "Internal Server error");
     }
