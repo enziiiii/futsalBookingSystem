@@ -24,6 +24,15 @@ CREATE TABLE IF NOT EXISTS user_roles (
     PRIMARY KEY (user_id, role_id)
 );
 
+CREATE TABLE token_blacklist (
+    id SERIAL PRIMARY KEY,
+    token TEXT NOT NULL UNIQUE,  -- Store the JWT token
+    expires_at TIMESTAMPZ NOT NULL,  -- Token expiration time
+    created_at TIMESTAMPZ DEFAULT now()
+)
+
 -- Indexes
 CREATE INDEX idx_users_email ON users(email);
 CREATE INDEX idx_roles_name ON roles(role_name);
+
+CREATE INDEX idx_token_blacklist_expires ON token_blacklist (expires_at);
