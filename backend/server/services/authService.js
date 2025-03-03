@@ -21,9 +21,6 @@ class AuthService {
             // hash password
             const saltRounds = 10;
             const passwordHash = await bcrypt.hash(password, saltRounds);
-
-            // Assign default 'user' role
-            await allModels.userModel.assignUserRole(newUser.user_id, 'user');
             
             // Create user with only essential fiels
             const newUser = await allModels.userModel.createUser(
@@ -33,6 +30,14 @@ class AuthService {
                 passwordHash,
                 phoneNumber
             );  
+
+            const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*])(?=.{8,})/;
+            if (!passwordRegex.test(password)) {
+                throw new ValidationError("Password must be *+ chars with 1 uppercase and 1 special character");
+            }
+            // Assign default 'user' role
+            await allModels.userModel.assignUserRole(newUser.user_id, 'user');
+
 
 
             // respond with filteredUser data
@@ -46,9 +51,9 @@ class AuthService {
             // handle databse errors (e.g., unique constraint violation)
             if (error.code === "23505") {
                 const message = error.constraint.includes("email")
-                    ? "Email already registered"
-                    : "Username already taken";
-                throw new UserAlreadyExistsError(message);
+                    ? "Email"
+                    : "Username";
+                throw new UserAlreadyExistsError(`${message} already exists`);
             } else { 
                 console.error("Database error:", error);
                 throw new InternalServerError("Failed to create user", error);
@@ -82,13 +87,36 @@ class AuthService {
         }
 
         // Generate JWT token
-        const token = generateToken({
+        const { accessToken, refreshToken } = generateToken({
             userId: user.user_id,
             email: user.email,
             roles: user.roles
         });
 
-        return { token, userId: user.user_id };
+        return { 
+            accessToken,
+            refreshToken, 
+            userId: user.user_id };
+    }
+
+
+    async isTokenRevoked(token) {
+        try {
+            const isRevoked = await allModels.tokenBlacklist.tokenExits(token);
+            return isRevoked;
+        } catch (error) {
+            console.error("Token revocation check failed:", error);
+            throw new InternalServerError("Failed to verify token status");
+        }
+    }
+
+    async revokeToken(token, expiresAt) {
+        try {
+            await allModels.tokenBlacklist.addToken(token, new Date(expiresAt * 1000));
+        } catch (error) {
+            console.error("Failed to revoke token:", error);
+            throw new InternalServerError("Failed to revoke token");
+        }
     }
 }
 
