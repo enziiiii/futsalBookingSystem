@@ -2,6 +2,9 @@ const handleResponse = require("../utils/handleResponse");
 const authService = require("../services/authService");
 const { AppError } = require("../utils/customErrors");
 const { verifyAccessToken } = require("../utils/jwt");
+const tokenBlacklist = require("../models/tokenBlacklistModel");
+const tokenService = require("../services/tokenService");
+const { setRefreshTokenCookie, clearRefreshTokenCookie } = require("../utils/cookieHelper");
 
 // *--Home page Logic ------
 const home = async (req, res) => {
@@ -21,6 +24,7 @@ const login = async (req, res) => {
         const { email, password } = req.body;
         const { accessToken, refreshToken, userId } = await authService.loginUser(email, password);
 
+        /* moved this in cookieHelper
         // set refresh token in HTTP-only cookie 
         res.cookie("refreshToken", refreshToken, {
             httpOnly: true,
@@ -28,12 +32,12 @@ const login = async (req, res) => {
             maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
             sameSite: "strict" // Prevent CSRF attacks
         });
+        */
 
-        handleResponse(res, 200, "Login successful", {
-            userId: userId,
-            // username: username,
-            accessToken
-        });
+        setRefreshTokenCookie(res, refreshToken);
+
+        handleResponse(res, 200, "Login successful", { userId: userId, accessToken });
+
     } catch (error) {
         console.error("Login error:", error);
 
@@ -50,15 +54,18 @@ const logout = async (req, res) => {
         if (token) {
             // add token to blacklist
             const decoded = verifyAccessToken(token);
-            await authService.revokeToken(token, decoded.exp);
+            await tokenService.revokeToken(token, decoded.exp);
         }
 
-
+        /* moved this in cookieHepler
         res.clearCookie("refreshToken", {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
             sameSite: "strict"
         });
+         */
+        clearRefreshTokenCookie(res);
+
         handleResponse(res, 200, "Logout successfull");
     } catch (error) {
         handleResponse(res, 500, "Internal Server error");
@@ -162,4 +169,9 @@ const register = async (req, res) => {
 */
  
 
-module.exports = {home, login, logout, register};
+module.exports = {
+    home, 
+    login, 
+    logout, 
+    register
+};
