@@ -8,6 +8,20 @@ const generateToken = (payload) => {
 };
 */
 
+const signPayLoad = (payload, secret, options) => {
+    return jwt.sign(payload, secret, options);
+};
+
+const verifyToken = (token, secret) => {
+    return jwt.verify(token, secret);
+};
+
+module.exports = {
+    signPayLoad,
+    verifyToken
+};
+
+/*
 const validateEnv = () => {
     const requiredVars = [
         'JWT_ACCESS_SECRET',
@@ -60,9 +74,6 @@ const verifyRefreshToken = (token) => {
         throw new Error('Invalid refresh token: ' + error.message);
     }
 };
+*/
 
-module.exports = {
-    generateToken,
-    verifyAccessToken,
-    verifyRefreshToken
-};
+
