@@ -19,12 +19,12 @@ class TokenBlacklist {
             ON CONFLICT (token) DO NOTHING;
         `;
 
-        await db.query(query, [token, expiresAt]);
+        await db.query(query, [token, new Date(expiresAt * 1000).toISOString()]);
     }
 
     async cleanExpiredTokens() {
         const query = `
-            'DELETE FROM token_blacklist
+            DELETE FROM token_blacklist
             WHERE expires_at < NOW()
         `;
         await db.query(query);
