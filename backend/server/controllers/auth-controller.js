@@ -1,8 +1,7 @@
 const handleResponse = require("../utils/handleResponse");
 const authService = require("../services/authService");
 const { AppError } = require("../utils/customErrors");
-const { verifyAccessToken } = require("../utils/jwt");
-const tokenBlacklist = require("../models/tokenBlacklistModel");
+// const { verifyAccessToken } = require("../utils/jwt");
 const tokenService = require("../services/tokenService");
 const { setRefreshTokenCookie, clearRefreshTokenCookie } = require("../utils/cookieHelper");
 
@@ -24,16 +23,6 @@ const login = async (req, res) => {
         const { email, password } = req.body;
         const { accessToken, refreshToken, userId } = await authService.loginUser(email, password);
 
-        /* moved this in cookieHelper
-        // set refresh token in HTTP-only cookie 
-        res.cookie("refreshToken", refreshToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-            sameSite: "strict" // Prevent CSRF attacks
-        });
-        */
-
         setRefreshTokenCookie(res, refreshToken);
 
         handleResponse(res, 200, "Login successful", { userId: userId, accessToken });
@@ -51,19 +40,13 @@ const login = async (req, res) => {
 const logout = async (req, res) => {
     try {
         const token = req.headers.authorization?.split(' ')[1];
-        if (token) {
+        const refreshToken = req.cookies.refreshToken;
+        if (refreshToken) {
             // add token to blacklist
-            const decoded = verifyAccessToken(token);
-            await tokenService.revokeToken(token, decoded.exp);
+            const decodedRefresh = tokenService.verifyAccessToken(refreshToken);
+            await tokenService.revokeToken(refreshToken, decodedRefresh.exp);
         }
 
-        /* moved this in cookieHepler
-        res.clearCookie("refreshToken", {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "strict"
-        });
-         */
         clearRefreshTokenCookie(res);
 
         handleResponse(res, 200, "Logout successfull");
@@ -102,6 +85,13 @@ const register = async (req, res) => {
         }
             */
     }
+};
+
+module.exports = {
+    home, 
+    login, 
+    logout, 
+    register
 };
 
 
@@ -169,9 +159,3 @@ const register = async (req, res) => {
 */
  
 
-module.exports = {
-    home, 
-    login, 
-    logout, 
-    register
-};
