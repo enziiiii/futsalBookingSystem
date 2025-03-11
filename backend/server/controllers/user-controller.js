@@ -1,6 +1,7 @@
 const { pool }  = require("../config/db");
 
 const { allModels } = require("../models");
+const passwordService = require("../services/passwordService");
 const handleResponse = require("../utils/handleResponse");
 
 
@@ -37,13 +38,23 @@ const getAllUsersController = async (req, res, next) => {
 };
 
 // Get user by ID
-const getUserByIdController = async (req, res) => {
+const getUserByIdController = async (req, res, next) => {
   const { userId } = req.params;
+
+  // check is 'useId' is a number
+  if (isNaN(userId)) {
+    return res.status(400).json({
+        message: "Invalid user ID format" 
+    });
+  }
+  
   try {
     const result = await pool.query(`SELECT * FROM users WHERE user_id = $1`, [userId]);
+
     if (result.rows.length === 0) {
         return handleResponse(res, 404, "User not found");
     }
+
     handleResponse(res, 200, "User fetched sucessfully", result.rows[0]);
   } catch (err) {
     next(err);
@@ -80,12 +91,29 @@ const deleteUserController = async (req, res, next) => {
     }
 };
 
+const changePassword = async (req, res) => {
+    try {
+        const { oldPassword, newPassword } = req.body;
+        const userId = req.user.userId;
+
+        await passwordService.changePassword(userId, oldPassword, newPassword);
+
+        handleResponse(res, 200, 'Password change successfully');
+    } catch (error) {
+        console.error('Change password error:', error);
+        handleResponse(res, error.statusCode || 500, error.message || 'Internal server error');
+    }
+};
+
+
+
 module.exports = { 
     createUserController,
     getAllUsersController,
     getUserByIdController,
     updateUserController,
-    deleteUserController
+    deleteUserController,
+    changePassword
  }
 
 // Create a new user
