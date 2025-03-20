@@ -10,6 +10,7 @@ const { allModels } = require("../models")
 //     }
 // });
 
+// this function ensures tokens are deleted automatically.
 const cleanUpExpiredTokens = async () => {
     try {
         console.log("Running token cleanup job");
