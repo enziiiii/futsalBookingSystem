@@ -17,7 +17,8 @@ const protect = async (req, res, next) => {
     try {
         // verify and decode token
         const decoded = tokenService.verifyAccessToken(token);
-
+        req.user - decoded;
+        
         // check token revocation
         const isRevoked = await tokenService.isTokenRevoked(token);
         if (isRevoked) {
@@ -74,14 +75,14 @@ const authorize = (allowedRoles = []) => {
 
         // checks role hierarchhy
         const roleHierarchy = {
-            asmin: ['asmin', 'staff'],
+            admin: ['admin', 'staff'],
             staff: ['staff', 'customer'],
             customer: ['customer']
         };
 
         // checks if any of the user's roles have sufficient privileges
         const hasPermission = currentRoles.some(role => 
-            allowedRoles.some(allowedRoles => 
+            allowedRoles.some(allowedRole => 
                 roleHierarchy[role]?.includes(allowedRole)
             )
         );
