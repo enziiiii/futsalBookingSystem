@@ -1,4 +1,11 @@
 
+
+const { allModels } = require("../models");
+const { AppError } = require("../utils/customErrors");
+const { verifyToken, signPayLoad } = require("../utils/jwt");
+const jwt = require("jsonwebtoken");
+
+
 class TokenService {
     constructor() {
         this.validateEnv();
@@ -20,10 +27,10 @@ class TokenService {
 
     }
 
-
+    // creates both access and refresh tokens during initial login/registration
     generateTokens(user) {
         return {
-            accessToken: jwt.signPayLoad(
+            accessToken: signPayLoad(
                 {
                     userId: user.user_id, // From users table
                     email: user.email,
@@ -33,31 +40,70 @@ class TokenService {
                 { expiresIn: process.env.JWT_ACCESS_EXPIRES_IN }
             ),
         
-            refreshToken: jwt.signPayLoad(
-                { 
-                    userId: user.user_id 
-                }, 
+            refreshToken: signPayLoad(
+                { userId: user.user_id, tokenVersion: user.token_version }, 
                 process.env.JWT_REFRESH_SECRET,
                 { expiresIn: process.env.JWT_REFRESH_EXPIRES_IN }
             )
         };
     }
 
+    // handles access token renewal in isolation
+    generateAccessToken(user) {
+        return signPayLoad(
+            {
+                userId: user.user_id,
+                email: user.email,
+                roles: user.roles
+            },
+            process.env.JWT_ACCESS_SECRET,
+            { expiresIn: process.env.JWT_ACCESS_EXPIRES_IN }
+        );
+    }
+
+    // handles refresh token renewal in isolation
+    generateRefreshToken(user) {
+        return signPayLoad(
+            { 
+                userId: user.user_id, 
+                tokenVersion: user.token_version
+            },
+
+            process.env.JWT_REFRESH_SECRET,
+            { expiresIn: process.env.JWT_REFRESH_EXPIRES_IN }
+        );
+    }
+
+    // verification methods
     verifyAccessToken(token) {
         try {
-            return jwt.verifyToken(token, process.env.JWT_ACCESS_SECRET);
+            return verifyToken(token, process.env.JWT_ACCESS_SECRET);
         } catch (error) {
             throw new Error('Invalid access token: ' + error.message);
         }
     }
 
-    verifyRefreshToken = (token) => {
+    async verifyRefreshToken(token) {
+        // try {
+        //     return verifyToken(token, process.env.JWT_REFRESH_SECRET);
+        // } catch (error) {
+        //     throw new Error('Invalid refresh token: ' + error.message);
+        // }
+
         try {
-            return jwt.verifyToken(token, process.env.JWT_REFRESH_SECRET);
+            const decoded = verifyToken(token, process.env.JWT_REFRESH_SECRET);
+            const user = await allModels.userModel.getUserById(decoded.userId);
+
+            if (!user) throw new AppError('UserNotFound', 404);
+            if (decoded.tokenVersion !== user.token_version) {
+                throw new AppError('TokenRevoked', 401);
+            }
+            return decoded;
         } catch (error) {
-            throw new Error('Invalid refresh token: ' + error.message);
+            throw new AppError('InvalidRefreshToken', 401, error.message);
         }
     }
+
 
     async isTokenRevoked(token) {
         try {
@@ -65,7 +111,7 @@ class TokenService {
             return isRevoked;
         } catch (error) {
             console.error("Token revocation check failed:", error);
-            throw new InternalServerError("Failed to verify token status");
+            throw new AppError("InternalServerError", 500, "Failed to verify token status");
         }
     }
 
@@ -74,7 +120,7 @@ class TokenService {
             await allModels.tokenBlacklist.addToken(token, new Date(expiresAt * 1000));
         } catch (error) {
             console.error("Failed to revoke token:", error);
-            throw new InternalServerError("Failed to revoke token");
+            throw new AppError("InternalServerError", 500, "Failed to revoke token");
         }
     }
 }
