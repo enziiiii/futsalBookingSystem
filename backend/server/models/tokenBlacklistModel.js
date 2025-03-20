@@ -1,3 +1,5 @@
+const { pool } = require('../config/db');
+
 class TokenBlacklist {
 
     async tokenExists(token) {
@@ -7,7 +9,7 @@ class TokenBlacklist {
                 WHERE token = $1 LIMIT 1
             ) AS is_revoked;
         `;
-        const result = await db.query(query, [token]);
+        const result = await pool.query(query, [token]);
         return result.rows[0].is_revoked;
     }
 
@@ -19,7 +21,7 @@ class TokenBlacklist {
             ON CONFLICT (token) DO NOTHING;
         `;
 
-        await db.query(query, [token, new Date(expiresAt * 1000).toISOString()]);
+        await pool.query(query, [token, new Date(expiresAt * 1000).toISOString()]);
     }
 
     async cleanExpiredTokens() {
@@ -27,7 +29,7 @@ class TokenBlacklist {
             DELETE FROM token_blacklist
             WHERE expires_at < NOW()
         `;
-        await db.query(query);
+        await pool.query(query);
     }
 }
 
