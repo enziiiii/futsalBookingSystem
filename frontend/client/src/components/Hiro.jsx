@@ -1,25 +1,27 @@
-// import React, { useEffect } from 'react'
-import { useRef, useState, useEffect } from 'react';
-import Button  from './Button';
-import { TiLocationArrow } from 'react-icons/ti';
+import { useRef, useState, useEffect } from 'react'
+import Button  from './Button'
+import { TiLocationArrow } from 'react-icons/ti'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/all'
+
+gsap.registerPlugin(ScrollTrigger)
 
 const Hiro = () => {
-    // const [currentIndex, setCurrentIndex] = useState(1);
-    // const [hasClicked, setHasClicked] = useState(false);
+    const [currentIndex, setCurrentIndex] = useState(1);
+    const [hasClicked, setHasClicked] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [loadedVideos, setLoadedVideos] = useState(0);
 
-    // const totalVideos = 3;
+    const totalVideos = 3;
     const nextVideoRef = useRef(null);
 
     const handleVideoLoad = () => {
-        // setLoadedVideos((prev) => prev + 1);
+        setLoadedVideos((prev) => prev + 1);
         setIsLoading(false);
     }
 
-    // const upcomingVideoIndex = (currentIndex % totalVideos) + 1;
+    const upcomingVideoIndex = (currentIndex % totalVideos) + 1;
 
     // // when a user click on the mini video and it expands
     // const handleMiniVdClick = () => {
@@ -28,6 +30,7 @@ const Hiro = () => {
     //     setCurrentIndex(upcomingVideoIndex);
     // }
 
+    // loading animation
     useEffect(() => {
         if(loadedVideos >= totalVideos) {
             setIsLoading(false);
@@ -61,7 +64,7 @@ const Hiro = () => {
     <div className="relative h-dvh w-screen overflow-x-hidden">
 
         {isLoading && (
-            <div className="flex items-center justify-center fixed top-0 left-0 w-screen h-screen z-[999] bg-violet-50">
+            <div className="flex-center absolute z-[100] h-dvh w-screen overflow-hidden bg-violet-50">
                 <div className="three-body">
                     <div className="three-body__dot" />
                     <div className="three-body__dot" />
@@ -98,7 +101,7 @@ const Hiro = () => {
                 
                 <video 
                     src={getVideoSrc(currentIndex === totalVideos - 1 ? 1 : currentIndex)}
-                    autoPlay
+                    // autoPlay
                     loop
                     muted
                     className="absolute left-0 top-0 size-full object-cover object-center"
@@ -106,7 +109,7 @@ const Hiro = () => {
                 />
             </div> 
 
-            <h1 className="special-font hiro-heading absolute bottom-5 right-1 z-40 text-blue-75 text-2xl lg:text-4xl xl:text-5xl font-bold">
+            <h1 className="special-font hiro-heading absolute bottom-5 right-1 z-40 text-blue-75 text-2xl lg:text-4xl xl:text-7xl">
                 F<b>u</b>tsal
             </h1>
 
@@ -117,11 +120,11 @@ const Hiro = () => {
                         Learn about us
                     </p>
                     
-                    <Button id="watch-trailer" title="Watch Clip" leftIcon={<TiLocationArrow />} containerClass="!bg-purple-300 flex-center gap-1" />
+                    <Button id="watch-trailer" title="Watch Clip" leftIcon={<TiLocationArrow />} containerClass="!bg-yellow-300 flex-center gap-1" />
                 </div>
             </div>
         </div>
-        <h1 className="special-font hiro-heading absolute bottom-5 right-1 text-black-75 text-2xl lg:text-4xl xl:text-5xl font-bold">
+        <h1 className="special-font hiro-heading absolute bottom-5 right-1 text-black-75 text-2xl lg:text-4xl xl:text-7xl">
                 F<b>u</b>tsal
         </h1>
     </div>
