@@ -14,7 +14,7 @@ class AuthService {
 
         // check email existence
         const existingUser = await allModels.userModel.getUserByEmail(email);
-        if (existingUser) {
+        if (existingUser) { 
             throw new UserAlreadyExistsError("Email already registered");
         }
 
@@ -80,6 +80,7 @@ class AuthService {
 
         // Find user by roles
         const user = await allModels.userModel.getUserByEmailWithRoles(email);
+        console.log('User from Db:', user);
         if (!user.roles || !user.password_hash) {
             throw new UnauthorizedError("Invaid email or password");
         }
@@ -91,21 +92,18 @@ class AuthService {
 
         await allModels.passwordModel.incrementTokenVersion(user.user_id);
 
-        // // Generate JWT token
-        // const { accessToken, refreshToken } = generateToken({
-        //     userId: user.user_id,
-        //     email: user.email,
-        //     roles: user.roles
-        // });
 
         // using tokenService instead of generateToken
-        const tokens = tokenService.generateTokens({
-            userId: user.user_id,
+        const tokenInput = {
+            user_id: user.user_id,
             email: user.email,
             roles: user.roles,
             token_version: user.token_version
-        });
+        };
+        console.log('Token input:', tokenInput);
+        const tokens = tokenService.generateTokens(tokenInput);
 
+        console.log('Generated tokens:', tokens);
         return { 
             accessToken: tokens.accessToken,
             refreshToken: tokens.refreshToken,
