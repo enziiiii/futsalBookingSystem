@@ -29,11 +29,13 @@ const getUserByEmail = async (email) => {
 };
 
 const assignUserRole = async (userId, roleName) => {
-  const role = await db.query(
-    'SELECT role_id FROM roles WHERE role_name = $1', [roleName]);
-    if (!role.rows[0]) throw new Error('Role nor found');
+  const role = await pool.query(
+    'SELECT role_id FROM roles WHERE role_name = $1', [roleName]
+  );
+
+  if (!role.rows[0]) throw new Error('Role not found');
   
-  await db.query(`
+  await pool.query(`
     INSERT INTO user_roles (user_id, role_id)
     VALUES ($1, $2)
     ON CONFLICT DO NOTHING
@@ -60,13 +62,13 @@ const getUserWithRolesById = async (userId) => {
     SELECT u.*, array_agg(r.role_name) as roles
     FROM  users u
     LEFT JOIN user_roles ur ON u.user_id = ur.user_id
-    LEFT JOIN roles r ON ur.role_id = r.rle_id
+    LEFT JOIN roles r ON ur.role_id = r.role_id
     WHERE u.user_id = $1
     GROUP BY u.user_id
   `;
 
   const result = await pool.query(query, [userId]);
-  return result.rows[0];
+  return result.rows[0] || null; // returns 'null' if user not found
 };
 
 // update user
@@ -131,7 +133,17 @@ const deleteUser = async (userId) => {
 };
 
 
-
+module.exports = {
+  createUser,
+  getAllUsers,
+  getUserById,
+  getUserByEmail,
+  assignUserRole,
+  getUserByEmailWithRoles,
+  getUserWithRolesById,
+  updateUser,
+  deleteUser
+};
 
 /* this is another way to CRUD model
 // Create User
@@ -209,14 +221,3 @@ const deleteUser = async (userId) => {
 };
 */
 
-module.exports = {
-  createUser,
-  getAllUsers,
-  getUserById,
-  getUserByEmail,
-  assignUserRole,
-  getUserByEmailWithRoles,
-  getUserWithRolesById,
-  updateUser,
-  deleteUser
-};
