@@ -29,13 +29,21 @@ class TokenService {
 
     // creates both access and refresh tokens during initial login/registration
     generateTokens(user) {
+        // console.log('User object for token generation:', user);
+        if (!user.user_id) {
+            console.error('User object missing user_id:', user);
+            throw new Error('Cannot generatetoken: user_id missing');
+        }
+
+        const accessPayload = {
+            userId: user.user_id, // From users table
+            email: user.email,
+            roles: user.roles // Array from user_roles join
+        };
+        console.log('Access token payload:', accessPayload);
         return {
             accessToken: signPayLoad(
-                {
-                    userId: user.user_id, // From users table
-                    email: user.email,
-                    roles: user.roles  // Array from user_roles join
-                },
+                accessPayload,
                 process.env.JWT_ACCESS_SECRET,
                 { expiresIn: process.env.JWT_ACCESS_EXPIRES_IN }
             ),
