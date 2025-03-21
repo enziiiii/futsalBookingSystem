@@ -3,7 +3,7 @@ const { ValidationError } = require("../utils/customErrors");
 const tokenService = require("./tokenService");
 
 class passwordService {
-    async resetPassword(usserId, newPassword) {
+    async resetPassword(userId, newPassword) {
         // Validate new password strength
         if (!isPasswordValid(newPassword)) {
             throw new ValidationError("Invalid password");
@@ -16,7 +16,22 @@ class passwordService {
 
         // optional: logout all session by revoking tokens
         await tokenService.revokeToken(userId);
+    }
 
+    isPasswordValid(password){
+        const passwordRegex =  /^(?=.*[A-Z])(?=.*[!@#$%^&*])(?=.{8,})/;
+        return passwordRegex.text(password);
+    }
+
+    async changePassword(userId, oldPassword, newPassword) {
+        const user = await allModels.userModel.getUserById(userId);
+        const isPasswordValid = await bcrypt.compare(oldPassword, user.password_hash);
+
+        if (!isPasswordValid) {
+            throw new ValidationError('Old password is incorrect');
+        }
+
+        await this.resetPassword(userId, newPassword);
     }
 }
 
