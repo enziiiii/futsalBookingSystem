@@ -24,7 +24,7 @@ class CourtModel {
 
     async getAllCourts() {
         try {
-            const result = await pool.query("SELECT * FROM courts");
+            const result = await this.pool.query("SELECT * FROM courts");
             return result.rows;
 
         } catch (error) {
@@ -34,7 +34,7 @@ class CourtModel {
 
     async getCourtById(courtId) {
         try {
-            const result = await pool.query("SELECT * FROM courts WHERE court_id = $1", [courtId]);
+            const result = await this.pool.query("SELECT * FROM courts WHERE court_id = $1", [courtId]);
             return result.rows[0];
 
         } catch (error) {
@@ -53,7 +53,7 @@ class CourtModel {
                 RETURNING *
             `;
 
-            const result = await pool.query(query, [court_name, location, hourly_rate, status, courtId]);
+            const result = await this.pool.query(query, [court_name, location, hourly_rate, status, courtId]);
             return result.rows[0];
 
         } catch (error) {
@@ -63,7 +63,7 @@ class CourtModel {
 
     async deleteCourt(courtId) {
         try {
-            const result = await pool.query("DELETE FROM courts WHERE court_id = $1 RETURNING *", [courtId]);
+            const result = await this.pool.query("DELETE FROM courts WHERE court_id = $1 RETURNING *", [courtId]);
             return result.rows[0];
         } catch (error) {
             throw new Error(`Failed to delete court: ${error.message}`);
@@ -71,6 +71,8 @@ class CourtModel {
     }
 
 }
+
+module.exports = new CourtModel(pool);
 
 
 
