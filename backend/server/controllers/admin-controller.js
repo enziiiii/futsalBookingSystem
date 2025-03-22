@@ -29,8 +29,18 @@ const getAdminDashboard = async (req, res) => {
     }
 };
 
+const getAllUsers = async (req, res) => {
+    try {
+        const users = await allModels.userModel.getAllUsers();
+        handleResponse(res, 200, "User fetch successfully", users);
+    } catch (error) {
+        next(error);
+    }
+};
+
 
 module.exports = {
     assignAdminRole,
-    getAdminDashboard
+    getAdminDashboard,
+    getAllUsers
 }
