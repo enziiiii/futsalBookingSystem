@@ -27,9 +27,9 @@ const login = async (req, res) => {
         // set the refresh token cookie securly using the helper function
         setRefreshTokenCookie(res, refreshToken);
 
-        // respond with the access token
+         // respond with the access token
         // handleResponse(res, 200, "Login successful", { userId: userId, token: accessToken });
-
+        
         return res.status(200).json({ token: accessToken});
     } catch (error) {
         console.error("Login error:", error);
