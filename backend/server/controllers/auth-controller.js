@@ -1,7 +1,6 @@
 const handleResponse = require("../utils/handleResponse");
 const authService = require("../services/authService");
 const { AppError } = require("../utils/customErrors");
-// const { verifyAccessToken } = require("../utils/jwt");
 const tokenService = require("../services/tokenService");
 const { setRefreshTokenCookie, clearRefreshTokenCookie } = require("../utils/cookieHelper");
 
@@ -21,12 +20,17 @@ const home = async (req, res) => {
 const login = async (req, res) => {
     try {
         const { email, password } = req.body;
+
+        // call the loginUser function from the authService.
         const { accessToken, refreshToken, userId } = await authService.loginUser(email, password);
 
+        // set the refresh token cookie securly using the helper function
         setRefreshTokenCookie(res, refreshToken);
 
-        handleResponse(res, 200, "Login successful", { userId: userId, accessToken });
+        // respond with the access token
+        // handleResponse(res, 200, "Login successful", { userId: userId, token: accessToken });
 
+        return res.status(200).json({ token: accessToken});
     } catch (error) {
         console.error("Login error:", error);
 
