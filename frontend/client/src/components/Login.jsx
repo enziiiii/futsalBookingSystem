@@ -55,7 +55,25 @@ const Login = () => {
     } catch (error) {
       console.error('Error during login:', error);
     }
-  };
+
+    /* // if you wanna havev nested data:
+    const responseData = await response.json();
+    if (responseData.data && responseData.data.token) {
+      const token = responseData.data.token;
+      const decoded = jwtDecode(token);
+      dispatch(loginSuccess(decoded));
+      if (decoded.roles && decoded.roles.includes('admin')) {
+        navigate('/admin');
+      } else if (decoded.roles && decoded.roles.includes('customer')) {
+        navigate('/customer-dashboard');
+      } else if (decoded.roles && decoded.roles.includes('staff')) {
+        navigate('/staff-dashboard');
+      }
+      localStorage.setItem('token', token);
+    } else {
+      console.error('Login failed');
+    } */
+  };  
   
 
   return (
