@@ -5,6 +5,7 @@ import gsap from 'gsap'
 import { TiLocationArrow } from 'react-icons/ti'
 import { useWindowScroll } from 'react-use'
 
+import { Link } from 'react-router-dom';
 
 const navItems = ['Home', 'About', 'Services', 'Contact', 'Login'];
 
@@ -79,14 +80,27 @@ const NavBar = () => {
                 <div className="flex h-full items-center">
                     <div className="hidden md:flex gap-5">
                         {navItems.map((item) => (
-                            <a key={item} href={`#${item.toLowerCase()}`} className="nav-hover-btn">
+                            // <a key={item} href={`#${item.toLowerCase()}`} className="nav-hover-btn">
+                            //     {item}
+                            // </a>
+                            <Link 
+                                key={item}
+                                to={item === 'Login' ? '/login' : `/#${item.toLowerCase()}`}
+                                className="nav-hover-btn"
+                            >
                                 {item}
-                            </a>
+                            </Link>
                         ))}
                     </div>
 
                     {/* audio */}
-                    <button className="ml-10 flex items-center space-x-0.5" onClick={toggleAudioIndicator}>
+                    <button className="ml-12 flex items-center space-x-0.5" 
+                    onClick={(e) => {
+                        e.stopPropagation();    // e.stopPropagation() prevvents the click event from bubbling up the parent <div>, ensuring the Link's naviagation isn't blocked
+                        console.log("Audio button clicked");
+                        toggleAudioIndicator();
+                        }}
+                    >
                         {/* hidden audio element */}
                         <audio ref={audioElementRef} className="hidden"
                             src="/audio/loop.mp3" loop />
