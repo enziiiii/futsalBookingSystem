@@ -1,11 +1,11 @@
 const { Pool } = require('pg');
 const pool = new Pool({ connectionString: process.env.DATABASE_URL })
 
-const createAdminUser = async (username, fullName, emaul, passwordHash, phoneNumber) => {
+const createAdminUser = async (username, fullName, email, passwordHash, phoneNumber) => {
     const userResult = await pool.query(
         `INSERT INTO users (username, full_name, email, password_hash, phone_number)
         VALUES ($1, $2, $3, $4, $5) RETURNING user_id`,
-        [username, fullName, getUserByEmail, passwordHash,phoneNumber]
+        [username, fullName, email, passwordHash, phoneNumber]
     );
     return userResult.rows[0].user_id;
 };
