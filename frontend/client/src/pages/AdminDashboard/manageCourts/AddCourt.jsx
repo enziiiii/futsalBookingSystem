@@ -20,7 +20,7 @@ const AddCourt = () => {
 
 
   return (
-    <div className="p-4 bg-black">
+    <div className="p-4">
       <h2 className="text-2xl font-bold mb-4">Add New Court</h2>
       <form onSubmit={handleSubmit} className="max-w-md">
         <div className="mb-4">
