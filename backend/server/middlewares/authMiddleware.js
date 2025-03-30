@@ -6,10 +6,12 @@ const { UnauthorizedError, ForbiddenError } = require("../utils/customErrors");
 
 
 const protect = async (req, res, next) => {
+    console.log('Protect middleware hit');
     const token = req.headers.authorization?.startsWith("Bearer")
         ? req.headers.authorization.split(" ")[1]
         : null;
     
+    console.log('Token fron request:', token);
     if (!token) {
         return next(new UnauthorizedError("Authentication required"));
     }
@@ -17,12 +19,13 @@ const protect = async (req, res, next) => {
     try {
         // verify and decode token
         const decoded = tokenService.verifyAccessToken(token);
-        req.user - decoded;
-        
+        console.log('Decoded token:', decoded);
+        req.user = decoded;
+
         // check token revocation
         const isRevoked = await tokenService.isTokenRevoked(token);
         if (isRevoked) {
-            throw new UnauthorizedError("Session expiered");
+            throw new UnauthorizedError("Session expired");
         }
 
         req.user = {
@@ -56,26 +59,35 @@ const protect = async (req, res, next) => {
 
 const authorize = (allowedRoles = []) => {
     return async (req, res, next) => {
+        console.log('Authorize middleware hit');
+        console.log('User from request:', req.user);
+        console.log('User ID:', req.user.userId);
+        console.log('Token Roles:', req.user.roles); // From JWT
+        console.log('Allowed Roles:', allowedRoles);
 
         // if (!allowedRoles.some(role => req.user.roles.includes(role))) {
         //     return next(new ForbiddenError("Insufficient permissions"));
         // }
 
-        if (!req.user) {
+        if (!req.user?.userId) {
             return next(new UnauthorizedError("Not authenticated"));
         }
 
+        // Fetch user roles from DB
         const userWithRoles = await allModels.userModel.getUserWithRolesById(req.user.userId);
+        console.log('user roles from DB: ', userWithRoles?.roles)
+        
         const currentRoles = userWithRoles?.roles || [];
 
         if (allowedRoles.length === 0) {
-            renewAccessToken.user.roles = currentRoles;
+            // renewAccessToken.user.roles = currentRoles;
+            req.user.roles = currentRoles;
             return next();
         }
 
         // checks role hierarchhy
         const roleHierarchy = {
-            admin: ['admin', 'staff'],
+            admin: ['admin', 'staff', 'customer'],
             staff: ['staff', 'customer'],
             customer: ['customer']
         };
@@ -88,7 +100,7 @@ const authorize = (allowedRoles = []) => {
         );
 
         if (!hasPermission) {
-            return next(new ForbiddenError("Insufficient perissions"));
+            return next(new ForbiddenError("Insufficient permissions"));
         }
 
         // attach fresh roles to request
