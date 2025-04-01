@@ -13,6 +13,8 @@ const AdminDashboard = () => {
             <li><Link to="/admin/courts" className="block py-2">Manage courts</Link></li>
             <li><Link to="/admin/users" className="block py-2">Manage users</Link></li>
             {/* <li><Link to="/admin/users"  className="block py-2">Manage users</Link></li> */}
+            <li><Link to="/admin/manageCustomers" className="block py-2">Manage Customers</Link></li>
+            <li><Link to="/admin/manageStaffs" className="block py-2">Manage Staffs</Link></li>
             <li><Link to="/admin/logOut" className="block py-2">Log Out</Link></li>
 
           </ul>
