@@ -1,9 +1,8 @@
 import React from 'react'
+import ManageUsers from './ManageUsers'
 
 const ManageCustomers = () => {
-  return (
-    <div>ManageCustomers</div>
-  )
-}
+  return <ManageUsers role="customer" />;
+};
 
-export default ManageCustomers
+export default ManageCustomers;
