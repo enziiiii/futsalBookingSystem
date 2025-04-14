@@ -1,13 +1,12 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import api from "../services/api";
 
-// to get courts
+// uses simple fetch rather than axios
+// to get courts as Admin
 export const fetchCourts = createAsyncThunk('courts/fetchCourts', async () => {
     const response = await fetch('http://localhost:5000/api/admin/courts', {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
     });
-
-    // const data = await response.json();
-    // return data;
 
     if (!response.ok) {
         throw new Error('Failed to fetch courts');
@@ -19,26 +18,25 @@ export const fetchCourts = createAsyncThunk('courts/fetchCourts', async () => {
 });
 
 
-// // to get courts
-// export const fetchCourtsAsCustomer = createAsyncThunk('courts/fetchCourts', async () => {
-//     const response = await fetch('http://localhost:5000/api/customer/courts', {
-//         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-//     });
+// to get courts as Customer
+export const fetchCourtsForCustomer = createAsyncThunk('courts/fetchCourtsForCustomer', 
+    async (_, { rejectWithValue }) => {
+    try {
+        const response = await api.get('/customer/courts');
+        console.log('API Response:', response.data);
+        return response.data.data || [];
+    } catch (error) {
+        console.error('Fetch courts error:', error.response?.data || error.message);
+        return rejectWithValue(error.response?.data || 'Failed to fetch courts');
+    }
+});
 
-//     // const data = await response.json();
-//     // return data;
 
-//     if (!response.ok) {
-//         throw new Error('Failed to fetch courts');
-//     }
-
-//     const responseData = await response.json();
-//     console.log('API response:', responseData);
-//     return responseData.data;
-// });
-
-// to add court
+ 
+// As Admin
 export const addCourt = createAsyncThunk('courts/addCourt', async (courtData) => {
+    console.log('From courtSlice, courtData being sent to backend:', courtData);
+
     const response = await fetch('http://localhost:5000/api/admin/courts', {
         method: 'POST',
         headers: { 
@@ -94,6 +92,7 @@ const courtSlice = createSlice({
     reducers: {},
     extraReducers: (builder) => {
         builder
+            // Admin cases
             .addCase(fetchCourts.pending, (state) => {
                 state.loading = 'pending';
             })
@@ -123,12 +122,25 @@ const courtSlice = createSlice({
                 state.courts = state.courts.filter((court) => court.court_id !== action.payload);
             })
 
-            // for customer
-            // .addCase(fetchAvailableCourts.fulfilled, (state, action) => {
-            //     state.status = 'succeeded';
-            //     state.availableCourts = action.payload;
-            // });
-    },
+            // Customer cases
+            .addCase(fetchCourtsForCustomer.pending, (state) => {
+                state.loading = 'pending';
+                console.log('Fetch courts for customer pending');
+            })
+
+            .addCase(fetchCourtsForCustomer.fulfilled, (state, action) => {
+                state.loading = 'succeeded';
+                console.log('Fetched courts:', action.payload);
+                state.courts = action.payload;
+                state.error = null;
+            })
+
+            .addCase(fetchCourtsForCustomer.rejected, (state, action) => {
+                state.loading = 'failed';
+                state.error = action.error.message;
+                console.log('Fetch courts failed:', action.error.message);
+            });
+        },
 });
 
 export default courtSlice.reducer;
