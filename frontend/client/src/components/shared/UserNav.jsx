@@ -2,7 +2,7 @@ import React from 'react'
 import { useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom'
 
-
+// so that navbar doesn't show up in everypages.
 
 const UserNav = () => {
     const navigate = useNavigate();
@@ -11,7 +11,7 @@ const UserNav = () => {
     const { user } = useSelector((state) => state.auth);
 
     // log user to see the structure and roles
-    console.log(user);
+    // console.log(user);
 
     // using .includes(' ') cause my roles are in array
     const homeRoute = user?.roles?.includes('admin') ? '/admin-dashboard' :
