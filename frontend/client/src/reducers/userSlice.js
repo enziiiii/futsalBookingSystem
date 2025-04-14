@@ -3,17 +3,26 @@ import api from "../services/api";
 
 
 export const fetchUsersByRole = createAsyncThunk('users/fetchUsersByRole', async({ role }) => {
-    const response = await api.get(`admin/users?role=${role}`);
-    console.log('API Response:', response.data);
+    const response = await api.get(`/admin/users?role=${role}`);
+    // console.log('API Response for:', response);     //Debug
     // return response.data;
-    return response.data.data; // Return the array inside the 'data'
+    console.log('From userSlice, Full API Response:', response);
+    console.log('API Data:', response.data);
+    return response.data.data; // Return the array inside the 'data' or Handle both response formats
     
 });
 
 export const addUser = createAsyncThunk('users/addUser', async (user) => {
-    const response = await api.post('/admin/users', user);
-    console.log('API Response:', response.data);
-    return response.data;
+    console.log("From userSlice addUser",user);
+    try {
+        const response = await api.post('/admin/users', user);
+        console.log('API Response:', response.data);
+        return response.data;
+    } catch (error) {
+        console.error('Error adding users:', error.response?.data || error.message);
+        throw error;
+    }
+    
 });
 
 export const updateUser = createAsyncThunk('users/updateUser', async ({ userId, user }) => {
@@ -22,13 +31,13 @@ export const updateUser = createAsyncThunk('users/updateUser', async ({ userId, 
         Object.entries(user).filter(([key]) => allowedFields.includes(key))
     );
 
-    console.log('Sending update data to API:', filteredUser);
+    console.log('From userSlice.js, Sending update data to API:', filteredUser);
     const response = await api.put(`admin/users/${userId}`, filteredUser);
     return response.data;
 });
 
-export const deleteUser = createAsyncThunk('/admin/users/deleteUser', async (userId) => {
-    await api.delete(`/users/${userId}`);
+export const deleteUser = createAsyncThunk('users/deleteUser', async (userId) => {
+    await api.delete(`/admin/users/${userId}`);
     return userId;
 });
 
@@ -36,7 +45,7 @@ export const deleteUser = createAsyncThunk('/admin/users/deleteUser', async (use
 const userSlice = createSlice({
     name: 'users',
     initialState: {
-        users: [],
+        usersByRole: { customer: [], staff: [] },
         status: 'idle',
         error: null,
     },
@@ -49,10 +58,12 @@ const userSlice = createSlice({
             })
 
             .addCase(fetchUsersByRole.fulfilled, (state, action) => {
-                state.status = 'Succeedded';
-                state.users = action.payload;
+                state.status = 'Succeeded';
+                const { role } = action.meta.arg;           // Extract the rolepassed to the thunk
+                state.usersByRole[role] = action.payload;   // Store users under the respective role
+                // state.users = action.payload;
                 // state.users = Array.isArray(action.payload.data) ? action.payload : [];
-                console.log('Assigned state.users:', state.users);
+                // console.log('Assigned state.users for roel:', action.meta.arg.role, ':', state.users);     // debug
             })
 
             .addCase(fetchUsersByRole.rejected, (state, action) => {
