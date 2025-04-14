@@ -1,9 +1,9 @@
 import React from 'react'
+import ManageUsers from './ManageUsers'
 
 const ManageStaffs = () => {
-  return (
-    <div>ManageStaffs</div>
-  )
-}
+  return <ManageUsers role="staff" />;
+
+};
 
 export default ManageStaffs
