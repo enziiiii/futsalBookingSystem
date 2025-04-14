@@ -1,3 +1,5 @@
+@import url("https://fonts.cdnfonts.com/css/general-sans");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -29,6 +31,7 @@ body {
         font-family: 'robert-regular';
         src: url('/fonts/robert-regular.woff2') format('woff2');
     }
+  
 }
 
 @layer utilities {
@@ -37,12 +40,12 @@ body {
       }
     
       .nav-hover-btn {
-        @apply relative ms-10 font-general text-xs uppercase text-blue-50 
-        after:absolute after:-bottom-0.5 after:left-0 after:h-[2px] after:w-full 
-        after:origin-bottom-right after:scale-x-0 after:bg-neutral-50
-        after:transition-transform after:duration-300 after:ease-[cubic-bezier(0.65_0.05_0.36_1)] 
+        @apply relative ms-10 font-general text-xs uppercase text-blue-50
+        after:absolute after:-bottom-0.5 after:left-0 after:h-[2px] after:w-full
+        after:origin-bottom-right after:scale-x-0 after:bg-neutral-800
+        after:transition-transform after:duration-300 after:ease-custom /* Correct usage */
         hover:after:origin-bottom-left hover:after:scale-x-100 dark:after:bg-white cursor-pointer;
-      }
+}
     
       .floating-nav {
         @apply bg-black rounded-lg border;
@@ -270,3 +273,4 @@ body {
         }
       }
 }
+
