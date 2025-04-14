@@ -16,7 +16,7 @@ const Payment = () => {
             const res = await api.put(`/customer/bookings/${bookingId}/confirm`);
             console.log('Payment respone:', res.data);
             alert('Payment successful! Booking confirmed.');
-            navigate('/customer/courts');
+            navigate('/customer/myBookings');
                 
         } catch (error) {
             alert('Payment failed> please try again');
