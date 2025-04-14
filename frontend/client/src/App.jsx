@@ -20,6 +20,7 @@ import ManageUsers from './pages/AdminDashboard/manageUsers/ManageUsers.jsx';
 import BookingForm from './pages/CustomerDashboard/BookingForm.jsx';
 import Court from './pages/CustomerDashboard/Court.jsx';
 import Payment from './pages/CustomerDashboard/Payment.jsx';
+import MyBookings from './pages/CustomerDashboard/MyBookings.jsx';
 
 
 
@@ -56,6 +57,7 @@ const App = () => {
           <Route path="/customer/courts" element={<Court />} />
           <Route path="/customer/booking/:courtId" element={<BookingForm />} />
           <Route path="/customer/payment/:bookingId" element={<Payment />} />
+          <Route path="/customer/myBookings" element={<MyBookings />} />
 
           {/* Staff routes */}
           
