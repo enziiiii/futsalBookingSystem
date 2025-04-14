@@ -17,6 +17,9 @@ import DashboardLayout from './components/sharedLayout/DashboardLayout.jsx';
 import ManageCustomers from './pages/AdminDashboard/manageUsers/ManageCustomers.jsx';
 import ManageStaffs from './pages/AdminDashboard/manageUsers/ManageStaffs.jsx';
 import ManageUsers from './pages/AdminDashboard/manageUsers/ManageUsers.jsx';
+import BookingForm from './pages/CustomerDashboard/BookingForm.jsx';
+import Court from './pages/CustomerDashboard/Court.jsx';
+import Payment from './pages/CustomerDashboard/Payment.jsx';
 
 
 
@@ -45,11 +48,17 @@ const App = () => {
           <Route path="admin/courts/add" element={<AddCourt />} />
           <Route path="admin/courts/:courtId/edit" element={<EditCourt />} />
 
-          <Route path="/admin/manageUsers" element={<ManageUsers />} />
+          <Route path="/admin/users" element={<ManageUsers />} />
           <Route path="/admin/manageCustomers" element={<ManageCustomers />} />
           <Route path="/admin/manageStaffs" element={<ManageStaffs />} />
 
-      
+          {/* Customer routes */}
+          <Route path="/customer/courts" element={<Court />} />
+          <Route path="/customer/booking/:courtId" element={<BookingForm />} />
+          <Route path="/customer/payment/:bookingId" element={<Payment />} />
+
+          {/* Staff routes */}
+          
 
         </Route>
       </Routes>
