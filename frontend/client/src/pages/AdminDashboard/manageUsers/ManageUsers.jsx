@@ -5,19 +5,25 @@ import UserFormModal from '../../../components/shared/UserFormModal';
 import { addUser, deleteUser, fetchUsersByRole, updateUser } from '../../../reducers/userSlice';
 
 const ManageUsers = ({ role }) => {
+  console.log('ManageUsers rendered with role:', role);    // Debug
+  
   const dispatch = useDispatch();
-  const { users, status } = useSelector((state) => state.users);
+  const { usersByRole, status } = useSelector((state) => state.users);
   const [showUserFormModal, setShowUserFormModal] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
 
+  const users = usersByRole[role] || [];    // Get users for current role 
+
   useEffect(() => {
     if (role && typeof role === 'string') {
+      console.log('Fetching users for role:', role)  // debuging to when click shows which user
       dispatch(fetchUsersByRole({ role }));
-      console.log('Role:', role);
+      // console.log('Role:', role);
     } else {
       console.error('Invalid role value:', role);
     }
   }, [dispatch, role]);
+  console.log('From ManageUser, Users in state:', users);    // Before rendering
 
   if (status === 'loading') {
     return <div>Loading...</div>
@@ -34,6 +40,7 @@ const ManageUsers = ({ role }) => {
 
   const handleEditUser = (user) => {
     setCurrentUser(user);
+    console.log('From ManageUser, user', user);
     setShowUserFormModal(true);
   };
 
@@ -44,7 +51,7 @@ const ManageUsers = ({ role }) => {
   };
 
   const handleSaveUser = (userData) => {
-    console.log('User data to save:', userData);
+    console.log('From ManageUsers, User data to save:', userData);
     if (currentUser) {
       dispatch(updateUser({ userId: currentUser.user_id, user: userData }));
     } else {
