@@ -3,8 +3,13 @@ import axios from 'axios';
 import api from "../services/api";
 
 export const fetchBookings = createAsyncThunk('bookings/fetchBookings', async (customerId) => {
-    const response = await axios.get(`/customer/bookings/${customerId}`);
-    return response.data.data;
+    try {
+        const response = await api.get(`/customer/bookings/${customerId}`);
+        return response.data.data;
+    } catch (error) {
+        console.error('Fetch bookings error:', error.response?.data || error.message);
+        return rejectWithValue(error.response?.data || 'Failed to fetch bookings');
+    }
 });
 
 export const createBooking = createAsyncThunk('bookings/createBooking', async (bookingData, {rejectWithValue }) => {
