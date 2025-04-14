@@ -13,11 +13,16 @@ const AddCourt = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const courtdata = { court_name: courtName, location, hourly_rate: Number(hourlyRate), status };
-    await dispatch(addCourt(courtdata)).unwrap();
+    const courtData = { court_name: courtName, 
+        location, 
+        hourly_rate: Number(hourlyRate), 
+        status,
+        // owner_id: 'A1'
+      };
+
+    await dispatch(addCourt(courtData)).unwrap();
     navigate('/admin/courts');
   };
-
 
   return (
     <div className="p-4">
@@ -63,7 +68,8 @@ const AddCourt = () => {
               onChange={(e) => setStatus(e.target.value)}
               className="w-full px-3 py-2 border rounded focus:outline-none focus:border-blue-500"
               required
-          >
+          >   
+              <option value="booked">Booked</option>
               <option value="available">Available</option>
               <option value="maintenance">Maintenance</option>
               <option value="closed">Closed</option>
