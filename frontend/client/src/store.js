@@ -9,6 +9,6 @@ export const store = configureStore({
         auth: authReducer,
         courts: courtReducer,
         users: userReducer,
-        bookings: bookReducer,
+        booking: bookReducer,
     },
 });
