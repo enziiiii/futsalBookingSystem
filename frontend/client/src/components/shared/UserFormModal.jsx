@@ -9,6 +9,7 @@ const UserFormModal = ({ user, role, onSave, onClose }) => {
     });
 
     const isNew = !user;
+    console.log('From UserFormMoal, isNew:', isNew, 'user:', user);
 
     const handleFormSubmit = (data) => {
         onSave(data);  // Passes form data to handleSaveUser
@@ -61,22 +62,45 @@ const UserFormModal = ({ user, role, onSave, onClose }) => {
                             disabled={isNew}
                         >
                             <option value="customer">Customer</option>
-                            <option value="customer">Staff</option>
+                            <option value="staff">Staff</option>
                         </select>
                         {errors.username && <span className="text-red-500">{errors.username.message}</span>}
                     </div>
+                    {isNew && (    // Add password for new users
+                        <div>
+                            {console.log('Rendering password field for new user')}
+                            <label htmlFor="password" className="block text-gray-700">Password</label>
+                            <input 
+                                type="password"
+                                id="password"
+                                {...register('password', { required: 'Passwor is required' })}
+                                className="w-full px-3 py-2 border rounded focus:outline-none focus:border-blue-500"
+                            />
+                            {errors.passwordHash && <span className="text-gray-500">{errors.passwordHash.message}</span>}
+                        </div>
+                    )}
                     {!isNew && (
                         <div>
                             <label htmlFor="password" className="block text-gray-700">Password</label>
                             <input 
                                 type="password"
                                 id="password"
-                                {...register('passwordHash')}
+                                {...register('password')}
                                 className="w-full px-3 py-2 border rounded focus:outline-none focus:border-blue-500"
                             />
-                            <small className="text-gray-500">Leave blank to keep the current passwor.</small>
+                            <small className="text-gray-500">Leave blank to keep the current password.</small>
                         </div>
                     )}
+                    <div>
+                        <label htmlFor="phoneNumber" className="block text-gray-700" >Phone Number</label>
+                        <input 
+                            type="Number"
+                            id="phoneNumber"
+                            {...register('phoneNumber', {required: 'Phone Number is required' })}
+                            className="w-full px-3 py-2 border rounded focus:outline-none focus:border-blue-500"
+                        />
+                        {errors.phoneNumber && <span className="text-red-500">{errors.phoneNumber.message}</span>}
+                    </div>
                     <div className="flex justify-end">
                         <button type="button" className="bg-gray-500 text-white px-4 py-2 rounded mr-2" onClick={onClose}>Cancel</button>
                         <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">Save</button>
