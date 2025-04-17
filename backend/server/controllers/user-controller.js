@@ -20,6 +20,11 @@ const handleResponse = (res, status, message, data = null) => {
 const createUserController = async (req, res, next) => {
     console.log("Request body: ", req.body);
     const { username, fullName,  email, password, phoneNumber } = req.body;
+
+   if (!username || !fullName || !email || !password || !phoneNumber) {
+    return res.status(400).json({ message: "All fields are required" });
+   }
+
     try {
         const newUser = await allModels.userModel.createUser(username, fullName, email, password, phoneNumber);
         handleResponse(res, 201, "user created successfully", newUser)
@@ -63,6 +68,7 @@ const getUserByIdController = async (req, res, next) => {
 
 const updateUserController = async (req, res, next) => {
     // const { username, email } = req.body;
+    console.log('Received:', req.body);
     const userId = parseInt(req.params.userId, 10);
     if (isNaN(userId)) {
         return handleResponse(res, 400, "invalid user Id");
