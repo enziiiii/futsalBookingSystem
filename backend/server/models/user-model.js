@@ -79,7 +79,7 @@ const updateUser = async (userId, updates) => {
   let counter = 1;
 
   for (const [key, value] of Object.entries(updates)) {
-    // Validate field namses and values
+    // Validate field names and values
     if (!allowedFields.includes(key)) { 
       throw new Error(`Invalid field: ${key}`);
     }
