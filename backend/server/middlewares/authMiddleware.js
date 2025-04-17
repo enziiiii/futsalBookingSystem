@@ -11,7 +11,7 @@ const protect = async (req, res, next) => {
         ? req.headers.authorization.split(" ")[1]
         : null;
     
-    console.log('Token fron request:', token);
+    console.log('Token from request:', token);
     if (!token) {
         return next(new UnauthorizedError("Authentication required"));
     }
@@ -38,7 +38,7 @@ const protect = async (req, res, next) => {
     } catch (error) {
         const message = error.name === "TokenExpiredError"
             ? "Session expired"
-            : "Invaild authentication token";
+            : "Invalid authentication token";
 
         next(new UnauthorizedError(message));
     }
@@ -85,7 +85,7 @@ const authorize = (allowedRoles = []) => {
             return next();
         }
 
-        // checks role hierarchhy
+        // checks role hierarchy
         const roleHierarchy = {
             admin: ['admin', 'staff', 'customer'],
             staff: ['staff', 'customer'],
@@ -152,7 +152,7 @@ const staffCourtAccess = async (req, res, next) => {
         courtId
     );
 
-    if (!isAuthorized) return next(new ForbiddenError("Not authrize for this court"));
+    if (!isAuthorized) return next(new ForbiddenError("Not authorize for this court"));
 
     next();
 };
