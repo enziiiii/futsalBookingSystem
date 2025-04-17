@@ -74,11 +74,20 @@ class CourtController {
 
     async getAvailableCourtController(req, res, next) {
         try {
-            const courts = await Court.getAllCourts();
+            const courts = await courtModel.getAllCourts();
             const availableCourts = courts.filter(court => court.status === 'available');
             res.status(200).json(availableCourts);
         } catch (error) {
             res.status(500).json({message: 'Error fetching available courts', error: error.message });
+        }
+    }
+
+    async getAllCourtsForCustomersController(req, res, next) {
+        try {
+            const courts = await courtModel.getAllCourts();
+            handleResponse(res, 200, 'All courts fetched successfully for customers', courts);
+        } catch (error) {
+            next(error);
         }
     }
 }
