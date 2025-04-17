@@ -1,5 +1,5 @@
-const { Pool } = require('pg');
-const pool = new Pool({ connectionString: process.env.DATABASE_URL })
+const { pool } = require('pg');
+
 
 const createAdminUser = async (username, fullName, email, passwordHash, phoneNumber) => {
     const userResult = await pool.query(
