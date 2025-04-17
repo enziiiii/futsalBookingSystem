@@ -8,7 +8,7 @@ const assignAdminRole = async (req, res) => {
         const roleResult = await allModels.roleModel.getRoleByName('owner');
         const roleId = roleResult.role_id;
 
-        await allModels.userModel.assignUserRole(userId, roleId);
+        await allModels.userModel.assignUserRole(userId, 'owner');
 
         handleResponse(res, 200, 'Admin role assigned successfully')
     } catch (error) {
