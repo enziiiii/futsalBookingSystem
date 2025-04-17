@@ -3,10 +3,9 @@ class AppError extends Error {
         super(message);
         this.statusCode = statusCode;
         this.name = this.constructor.name; // sets error name (e.g., "AppError")
-        this.isOperational = true; // Distinguishes operational vs programmer errors
+        this.isOperational = true; // Differ operational vs programmer errors
         Error.captureStackTrace(this, this.constructor); 
     }
-
 }
 
 class ValidationError extends AppError {
@@ -46,7 +45,7 @@ class InternalServerError extends AppError {
         this.originalError = originalError; // capture the original DB error
     }
 }
-
+ 
 const CustomErrors = {
     AppError,
     ValidationError,
