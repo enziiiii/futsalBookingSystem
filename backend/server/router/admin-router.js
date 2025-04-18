@@ -25,10 +25,11 @@ router.put("/courts/:courtId", protect, authorize(["admin"]), validateCourt('upd
 router.delete("/courts/:courtId", protect, authorize(["admin"]), courtController.deleteCourtController);
 
 // Admin-customer management routes
-// router.get("/users", protect, authorize(["admin"]), userController.getAllUsersController);
-router.get("/users", protect, authorize(["admin"]), roleController.getUsersByRoleController);
+router.get("/users", protect, authorize(["admin"]), userController.getAllUsersController);
+// router.get("/users", protect, authorize(["admin"]), roleController.getUsersByRoleController);
 router.post("/users", protect, authorize(["admin"]), validateUser('createUserSchema'), userController.createUserController);
 router.put("/users/:userId", protect, authorize(["admin"]), userController.updateUserController);
+router.delete('/users/:userId', protect, authorize(['admin']), userController.deleteUserController);
 
 // Admin-staff management routes
 
