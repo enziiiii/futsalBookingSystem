@@ -4,7 +4,7 @@ import api from "../services/api";
 
 export const fetchBookings = createAsyncThunk('bookings/fetchBookings', async (customerId) => {
     try {
-        const response = await api.get(`/customer/bookings/${customerId}`);
+        const response = await api.get(`/customer/bookings`);
         return response.data.data;
     } catch (error) {
         console.error('Fetch bookings error:', error.response?.data || error.message);
@@ -33,7 +33,7 @@ export const fetchBookedHours = createAsyncThunk('bookings/fetchBookedHours', as
 
 export const confirmBooking = createAsyncThunk('bookings/confirmBooking', async (bookingId, { rejectWithValue }) => {
     try {
-        const response = await api.put(`/bookings/${bookingId}/confirm`);
+        const response = await api.put(`customer/bookings/${bookingId}/confirm`);
         return response.data.data;
     } catch (error) {
         return rejectWithValue(error.response?.data || 'Failed to confirm booking');
