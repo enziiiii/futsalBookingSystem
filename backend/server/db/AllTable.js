@@ -1,9 +1,12 @@
 const { pool } = require('../config/db');
+const createBookingTable = require('./createBookingTable');
 const createCourtTable = require('./createCourtTable');
+const createPaymentTable = require('./createPaymentTable');
 const createRoleTable = require("./createRoleTable");
 const createTokenBlacklistTable = require('./createTokenBlacklistTable');
 const createUserRoleTable = require('./createUserRoleTable');
 const createUserTable = require("./createUserTable");
+
 
 const initializeSchemaTable = async () => {
     const client = await pool.connect();
@@ -16,6 +19,8 @@ const initializeSchemaTable = async () => {
         await createUserRoleTable(client);
         await createTokenBlacklistTable(client);
         await createCourtTable(client);
+        await createBookingTable(client);
+        // await createPaymentTable(client);
    
 
         await client.query("COMMIT");
