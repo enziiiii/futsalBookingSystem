@@ -1,5 +1,3 @@
-
-
 const { allModels } = require("../models");
 const { AppError } = require("../utils/customErrors");
 const { verifyToken, signPayLoad } = require("../utils/jwt");
@@ -32,7 +30,7 @@ class TokenService {
         // console.log('User object for token generation:', user);
         if (!user.user_id) {
             console.error('User object missing user_id:', user);
-            throw new Error('Cannot generatetoken: user_id missing');
+            throw new Error('Cannot generate token: user_id missing');
         }
 
         const accessPayload = {
