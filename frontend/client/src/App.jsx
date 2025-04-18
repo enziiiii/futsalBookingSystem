@@ -1,6 +1,8 @@
 import React from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Login from './components/Login.jsx'
+import Register from './components/Register.jsx';
+
 import MainPage from './components/MainPage'
 
 import AdminDashboard from './pages/AdminDashboard/AdminDashboard.jsx';
@@ -21,6 +23,7 @@ import BookingForm from './pages/CustomerDashboard/BookingForm.jsx';
 import Court from './pages/CustomerDashboard/Court.jsx';
 import Payment from './pages/CustomerDashboard/Payment.jsx';
 import MyBookings from './pages/CustomerDashboard/MyBookings.jsx';
+import CourtAvailability from './pages/CustomerDashboard/CourtAvailability.jsx';
 
 
 
@@ -33,7 +36,7 @@ const App = () => {
         <Route element={<NavLayout />}>
           <Route path="/" element={<MainPage />} />
           <Route path="/login" element={<Login />} />
-          {/* <Route path="/register" element={<Register />} /> */}
+          <Route path="/register" element={<Register />} />
         </Route>
         
         {/* Routes without navbar (post-login) */}
@@ -58,6 +61,8 @@ const App = () => {
           <Route path="/customer/booking/:courtId" element={<BookingForm />} />
           <Route path="/customer/payment/:bookingId" element={<Payment />} />
           <Route path="/customer/myBookings" element={<MyBookings />} />
+          <Route path="/customer/courtAvailability" element={<CourtAvailability />} />
+          
 
           {/* Staff routes */}
           
