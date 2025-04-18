@@ -1,7 +1,6 @@
 const express = require("express");
 const userController = require("../controllers/user-controller");
 
-const { protect, authorize, renewAccessToken } = require("../middlewares/authMiddleware");
 const { validateUser } = require("../middlewares/inputValidator");
 
 const router = express.Router();
@@ -12,10 +11,11 @@ router.get("/:userId", userController.getUserByIdController);
 router.put("/:userId", userController.updateUserController);
 router.delete("/:userId", userController.deleteUserController);
 
+module.exports = router;
+
+
 // router.get("/profile", renewAccessToken, protect, userController.getProfile); // need to make a 
 
 
 // admin or staffs
 // router.post("/courts", authorize(['admin', 'staff'], userController.courtController));
-
-module.exports = router;
