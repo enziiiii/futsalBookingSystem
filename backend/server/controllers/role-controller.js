@@ -34,35 +34,9 @@ const getUserRoles = async (req, res) => {
 };
 
 
-const getUsersByRoleController = async (req, res, next) => {
-    console.log('Controller reached');
-    const { role } = req.query;
-    console.log('From roleController, Fetching users with role:', role);  // debug
 
-    try {
-        let users;
-        if (role) {
-            users = await getUsersByRole(role);
-        } else {
-            users = await allModels.roleModel.getAllUserWithRoles();
-        }
-    
-        console.log('Controller response:', users);
-        if (!users || users.length === 0) {
-            // return res.status(200).json({ status: 200, message: "No users found for this role", data: [] });
-            return handleResponse(res, 200, "No users found for this role", []);
-        }
-
-            res.status(200).json({ status: 200, message: "users fetched successfully", data: users });
-        // handleResponse(res, 200, "users fetched successfully", users);
-    } catch (err) {
-        console.error('Error in getUserByRoleController:', err);
-        next(err);
-    }
-};
 
 module.exports = {
     assignUserRole,
-    getUserRoles,
-    getUsersByRoleController
+    getUserRoles
 }
