@@ -22,6 +22,15 @@ const schemas = {
         password: z.string().min(8).max(255)
     }),
 
+    // --------------- for user update-----------------------------
+    updateUserSchema: z.object({
+        username: z.string().min(3).max(50).optional(),
+        fullName: z.string().min(1).max(100).optional(),
+        email: z.string().email().optional(),
+        phoneNumber: z.string(0).min(10).max(20).optional(),
+        passswordHash: z.string().min(8).optional(),
+    }),
+
     
     // ----------------- for Court -------------------------------------//
     
@@ -50,6 +59,19 @@ const validateUser = (schema) => (req, res, next) => {
     next();
 };
 
+const validateUpdateUser = (req, res, next) => {
+    try {
+        updateUserSchema.parse(req.body);
+        next();
+    } catch (err) {
+        res.status(4).
+        json({ message: 'Invaild input',
+            errors: err.erros 
+        });
+    }
+};
+
+
 const validateCourt = (schema) => (req, res, next) => {
     const parseResult = schemas[schema].safeParse(req.body);
     if (!parseResult.success) {
@@ -64,5 +86,6 @@ const validateCourt = (schema) => (req, res, next) => {
 
 module.exports = {
     validateUser,
-    validateCourt
+    validateCourt,
+    validateUpdateUser
 }
