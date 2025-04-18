@@ -6,10 +6,13 @@ const router = express.Router();
 const authRouter = require("./auth-router.js");
 const userRouter = require("./user-router");
 const adminRouter = require("./admin-router.js");
+const customerRouter = require("./customer-router.js");
 
 // Use sub-routers
 router.use("/auth", authRouter);
-router.use("/user", userRouter);
+router.use("/users", userRouter);
 router.use("/admin", adminRouter);
+router.use("/customer", customerRouter);
+
 
 module.exports = router;
