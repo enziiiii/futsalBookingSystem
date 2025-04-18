@@ -33,14 +33,14 @@ const createUserController = async (req, res, next) => {
     }
 };
 
-const getAllUsersController = async (req, res, next) => {
-    try{
-        const users = await allModels.userModel.getAllUsers();
-        handleResponse(res, 200, "User fetch successfully", users);
-    } catch (err) {
-        next(err);
-    }
-};
+// const getAllUsersController = async (req, res, next) => {
+//     try{
+//         const users = await allModels.userModel.getAllUsers();
+//         handleResponse(res, 200, "User fetch successfully", users);
+//     } catch (err) {
+//         next(err);
+//     }
+// };
 
 // Get user by ID
 const getUserByIdController = async (req, res, next) => {
@@ -111,6 +111,21 @@ const changePassword = async (req, res) => {
     }
 };
 
+const getAllUsersController = async (req, res, next) => {
+    try {
+        const { role } = req.query;
+        let users;
+        if (role) {
+            users = await allModels.userModel.getUsersByRole(role);
+        } else {
+            users = await allModels.userModel.getAllUserWithRoles();
+        }
+        handleResponse(res, 200, "Users fetch successfully", users);
+    } catch (err) {
+        next(err);
+    }
+}
+
 
 
 module.exports = { 
@@ -119,7 +134,8 @@ module.exports = {
     getUserByIdController,
     updateUserController,
     deleteUserController,
-    changePassword
+    changePassword,
+    getAllUsersController
  }
 
 // Create a new user
