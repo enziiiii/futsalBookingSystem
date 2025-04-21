@@ -5,6 +5,7 @@ import { loginSuccess } from '../reducers/authSlice';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { EyeIcon , EyeSlashIcon } from '@heroicons/react/24/outline';
+import { Lock, Mail } from 'lucide-react'
 
 const Login = () => {
 
@@ -27,7 +28,7 @@ const Login = () => {
       });
 
       // debug
-      console.log('Respone Status:', response.status);
+      // console.log('Respone Status:', response.status);
 
       if (!response.ok) {
         throw new Error('Login failed with status: ' + response.status);
@@ -42,10 +43,10 @@ const Login = () => {
         dispatch(loginSuccess(decoded));
         if (decoded.roles.includes('admin')) {
           navigate('/admin-dashboard');
-        } else if (decoded.roles.includes('customer')) {
-          navigate('/customer-dashboard');
         } else if (decoded.roles.includes('staff')) {
           navigate('/staff-dashboard');
+        } else if (decoded.roles.includes('customer')) {
+          navigate('/customer-dashboard');
         }
 
         localStorage.setItem('token', data.token);
@@ -55,24 +56,6 @@ const Login = () => {
     } catch (error) {
       console.error('Error during login:', error);
     }
-
-    /* // if you wanna havev nested data:
-    const responseData = await response.json();
-    if (responseData.data && responseData.data.token) {
-      const token = responseData.data.token;
-      const decoded = jwtDecode(token);
-      dispatch(loginSuccess(decoded));
-      if (decoded.roles && decoded.roles.includes('admin')) {
-        navigate('/admin');
-      } else if (decoded.roles && decoded.roles.includes('customer')) {
-        navigate('/customer-dashboard');
-      } else if (decoded.roles && decoded.roles.includes('staff')) {
-        navigate('/staff-dashboard');
-      }
-      localStorage.setItem('token', token);
-    } else {
-      console.error('Login failed');
-    } */
   };  
   
 
@@ -81,17 +64,10 @@ const Login = () => {
       <div className="w-full max-w-md p-8 bg-slate-200 shadow-md rounded">
         <form onSubmit={handleSubmit}>
           <h2 className="text-2xl font-bold mb-6">Login</h2>
-          <div className="mb-4">
-            <label htmlFor="email" className="block text-gray-700">Email</label>
+          <div className="mb-4 flex">
+            {/* <label htmlFor="email" className="block text-gray-700">Email</label> */}
+            <Mail />
             <input
-             /* type="text"
-              id="username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
-              placeholder="Enter your username"
-              autoComplete="username" */
-
               type="email"
               id="email"
               value={email}
@@ -100,25 +76,29 @@ const Login = () => {
               placeholder="Enter your email"
             />
           </div>
+
           <div className="mb-4 relative">
-            <label htmlFor="password" className="block text-gray-700">Password</label>
-            <input
-              type={showPassword ? 'text' : 'password'}
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 pr-10"
-              placeholder="Enter your password"
-              autoComplete="current-password"
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-11 -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              aria-label={showPassword ? 'Hide password' : 'Show password'}
-            >
-              {showPassword ? <EyeSlashIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
-            </button>
+            {/* <label htmlFor="password" className="block text-gray-700">Password</label> */}
+            <div className="flex">
+              <Lock />
+              <input
+                type={showPassword ? 'text' : 'password'}
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 pr-10"
+                placeholder="Enter your password"
+                autoComplete="current-password"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-5 -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? <EyeSlashIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
+              </button>
+            </div>
           </div>
           <div className="text-right mb-4">
             <Link to="/forgot-password" className="text-sm text-blue-500 hover:underline">Forgot Password?</Link>
