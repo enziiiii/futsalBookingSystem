@@ -86,13 +86,24 @@ class BookingModel {
     }
 
     async cancelBooking(bookingId, reason) {
+      try {
+        const parsedBookingId = parseInt(bookingId, 10);
+        if (isNaN(parsedBookingId)) {
+            throw new Error('Invalid booking_id');
+        }
         const query = {
             text: "UPDATE bookings SET status = 'canceled', cancellation_timestamp = CURRENT_TIMESTAMP, cancellation_reason = $1 WHERE booking_id = $2 RETURNING *",
-            values: [reason || 'No reason provided', bookingId],
+            values: [reason || 'No reason provided', parsedBookingId],
         };
 
         const result = await this.pool.query(query);
+        if (!result.rows[0]) {
+            throw new Error('Booking not found');
+        }
         return result.rows[0];
+      } catch (error) {
+        throw new Error(`Failed to cancel booking: ${error.message}`)
+      }
     }
 
     async getPendingBookingOlderThan(time) {
@@ -126,6 +137,66 @@ class BookingModel {
             return result.rows;
         } catch (error) {
             throw new Error(`Failed to fetch bookings: ${error.message}`);
+        }
+    }
+
+    async getBookings(startDate, endDate, courtId, status) {
+        try {   
+            const query =`
+            SELECT b.*, u.full_name AS customer_name, c.court_name
+            FROM bookings b
+            JOIN users u ON b.customer_id = u.user_id
+            JOIN courts c ON b.court_id = c.court_id
+            WHERE ($1::timestamp IS NULL OR b.start_time >= $1)
+            AND ($2::timestamp IS NULL OR b.end_time <= $2)
+            AND ($3::int IS NULL OR b.court_id = $3)
+            AND ($4::varchar IS NULL OR b.status = $4)
+            ORDER BY b.start_time;
+            `;
+
+            const values = [startDate || null, endDate || null, courtId || null, status || null]
+            const result = await this.pool.query(query, values);
+            return result.rows;
+        } catch (error) {
+            throw new Error(`Failed to get bookings: ${error.message}`);
+        }
+    }
+
+    async upateBooking(bookingId, updates) {
+        try {
+            const parsedBookingId = parseInt(bookingId, 10);
+            if (isNaN(parsedBookingId)) {
+                throw new Error('Invalid bokking_id');
+            }
+
+            const fields = [];
+            const values = [];
+            let counter = 1;
+
+            for (const [key, value] of Object.entries(updates)) {
+                if (['start_time', 'end_time', 'court_id', 'status'].includes(key)) {
+                    fields.push(`${key} = $${counter}`);
+                    values.push(value);
+                    counter++;
+                }
+            }
+
+            if (fields.length === 0) {
+                throw new Error('No valid fields to update');
+            }
+
+            values.push(parsedBookingId);
+            const query =`
+                UPDATE bookings
+                SET ${fields.join(",")}, updated_at = CURRENT_TIMESTMP
+                WHERE booking_id = $${counter}
+                RETURNING *;
+            `;
+
+            const result = await this.pool.query(query, values);
+            return result.rows[0];
+        } catch (error) {
+            throw new Error(`Failed to updated booking: ${error.message}`);
         }
     }
 }
