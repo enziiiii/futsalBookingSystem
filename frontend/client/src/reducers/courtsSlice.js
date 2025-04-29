@@ -17,6 +17,18 @@ export const fetchCourts = createAsyncThunk('courts/fetchCourts', async () => {
     return responseData.data;
 });
 
+// to get courts as staff
+export const fetchStaffCourts = createAsyncThunk('courts/fetchStaffCourts', async (_, { rejectWithValue }) => {
+    try {
+        const response = await api.get('staff/courts');
+        console.log('Staff court API response:', response.data);
+        return response.data.data;
+    } catch (error) {
+        console.error('Error fetching staff courts:', error);
+        return rejectWithValue(error.response?.data || { message: 'Failed to fetch courts' });
+    }
+});
+
 
 // to get courts as Customer
 export const fetchCourtsForCustomer = createAsyncThunk('courts/fetchCourtsForCustomer', 
@@ -120,6 +132,22 @@ const courtSlice = createSlice({
 
             .addCase(deleteCourt.fulfilled, (state, action) => {
                 state.courts = state.courts.filter((court) => court.court_id !== action.payload);
+            })
+
+            // staff
+            .addCase(fetchStaffCourts.pending, (state) => {
+                state.loading = 'loading';
+            })
+
+            .addCase(fetchStaffCourts.fulfilled, (state, action) =>{
+                state.loading = 'succeeded';
+                state.courts = action.payload;
+                state.error = null;
+            })
+
+            .addCase(fetchStaffCourts.rejected, (state, action) => {
+                state.loading = 'failed';
+                state.error = action.payload;
             })
 
             // Customer cases
