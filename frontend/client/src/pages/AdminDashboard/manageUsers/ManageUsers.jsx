@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import UserList from '../../../components/shared/UserList';
 import UserFormModal from '../../../components/shared/UserFormModal';
-import { addUser, deleteUser, fetchUsersByRole, updateUser } from '../../../reducers/userSlice';
+import { addUser, deleteUser, fetchUsersByRole, updateUser, updateUserRoles } from '../../../reducers/userSlice';
 
 const ManageUsers = ({ role }) => {
   console.log('ManageUsers rendered with role:', role);    // Debug
@@ -53,9 +53,21 @@ const ManageUsers = ({ role }) => {
   const handleSaveUser = (userData) => {
     console.log('From ManageUsers, User data to save:', userData);
     if (currentUser) {
-      dispatch(updateUser({ userId: currentUser.user_id, user: userData }));
+      const userUpdates = {
+        username : userData.username,
+        fullName: userData.fullName,
+        email: userData.email,
+        phoneNumber: userData.phoneNumber,
+      };
+      dispatch(updateUser({ userId: currentUser.user_id, user: userUpdates }));
+
+      const newRole = userData.role;
+      const currentRoles = currentUser.roles || [];
+      if  (newRole && !currentRoles.includes(newRole)) {
+        dispatch(updateUserRoles({ userId: currentUser.user_id, roles: [newRole] }));
+      }
     } else {
-      dispatch(addUser({ ...userData, role}))   // {...} using spread object to copy an array
+      dispatch(addUser({ ...userData, role: userData.role }))   // {...} using spread object to copy an array
     }
     setShowUserFormModal(false);
   };
