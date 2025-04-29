@@ -93,34 +93,3 @@ class CourtController {
 }
 
 module.exports = new CourtController();
-
-
-/*
-const createCourtController = async (req, res, next) => {
-    try {
-        const courtData = req.body;
-        const newCourt = await courtModel.createCourt(courtData);
-        handleResponse(res, 201, "Court creted successfully", newCourt);
-
-    } catch (error) {
-        next(error);
-    }
-};
-
-const getAllCourtsController = async (req, res, next) => {
-    try {
-        const courts = await courtModel.getAllCourts();
-        handleResponse(res, 200, "Courts fetch uccessfulyy", courts);
-    } catch (error) {
-        next(error);
-    }
-};
-
-
-
-module.exports = {
-    createCourtController,
-    getAllCourtsController
-}
-    */
-
