@@ -14,9 +14,9 @@ const UserList = ({ users, onEditUser, onDeleteUser }) => {
                 <th className="border p-2">UserName</th>
                 <th className="border p-2">Full Name</th>
                 <th className="border p-2">Email</th>
-                {/* <th className="border p-2">Password</th> */}
-                {/* <th className="border p-2">Role</th> */}
                 <th className="border p-2">Role</th>
+                <th className="border p-2">Phone Number</th>
+                
                 <th className="border p-2">Actions</th>
             </tr>
         </thead>
@@ -28,13 +28,12 @@ const UserList = ({ users, onEditUser, onDeleteUser }) => {
                         <td className="border p-2">{user.username}</td>
                         <td className="border p-2">{user.full_name}</td>
                         <td className="border p-2">{user.email}</td>
-                        {/* <td className="border p-2">{user.password_hash}</td> */}
-                        {/* <td className="border p-2">{user.role}</td> */}
                         <td className="border p-2">
                             {user.roles 
                             ? user.roles.join(', ') 
                             : 'No roles assigned'}
                         </td>
+                        <td className="border p-2">{user.phone_number}</td>
                         <td className="border p-2">
                             <button className="bg-yellow-500 text-white px-2 py-1 rounded mr-2" onClick={() => onEditUser(user)}>Edit</button>
                             <button className="bg-red-500 text-white px-2 py-1 rounded" onClick={() => handleDelete(user.user_id)}>Delete</button>
