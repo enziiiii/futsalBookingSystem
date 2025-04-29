@@ -11,10 +11,16 @@ const limiter = rateLimit({
     message: "Too many attempts, please try again later"
 });
 
-
+// Home Route
 router.route("/").get(authControllers.home);
+
+// Login Route
 router.route("/login").post(limiter, validateUser('loginSchema'), authControllers.login);
+
+// Logout Route
 router.route("/logout").post(authControllers.logout);
+
+// Register Route
 router.route("/register").post(validateUser('registerSchema'),authControllers.register);
 
 
