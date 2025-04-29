@@ -1,6 +1,6 @@
 const { pool } = require('../config/db');
 
-const createCourtTable =async () => {
+const createCourtTable = async () => {
     const queryText = `
     CREATE TABLE IF NOT EXISTS courts (
     court_id SERIAL PRIMARY KEY,
@@ -10,7 +10,7 @@ const createCourtTable =async () => {
     status VARCHAR(50) DEFAULT 'available',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-)
+    )
     `;
     try {
         await pool.query(queryText);
