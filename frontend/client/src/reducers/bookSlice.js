@@ -2,7 +2,30 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from 'axios';
 import api from "../services/api";
 
-export const fetchBookings = createAsyncThunk('bookings/fetchBookings', async (customerId) => {
+// Fetch booking for admin
+export const fetchAdminBookings = createAsyncThunk('bookings/fetchAdminBookings', async () => {
+    try {
+        const response = await api.get(`/admin/bookings`);
+        return response.data.data;
+    } catch (error) {
+        console.error('Fetch admin bookings error:', error.response?.data || error.messgage);
+        return rejectWithValue(error.response?.data || 'Failed to fetch admin bookings');
+    }
+});
+
+// Fetch booking for Staff
+export const fetchStaffBookings = createAsyncThunk('booking/fetchBookings', async () => {
+    try {
+        const response = await api.get(`/staff/bookings`);
+        return response.data.data;
+    } catch (error) {
+        console.error('Fetch bookings error:', error.response?.data || error.message);
+        return rejectWithValue(error.response?.data || 'Failed tp fetch Staff bookings')
+    }
+});
+
+// Fetch bookings for customer
+export const fetchBookings = createAsyncThunk('bookings/fetchBookings', async () => {
     try {
         const response = await api.get(`/customer/bookings`);
         return response.data.data;
@@ -40,39 +63,92 @@ export const confirmBooking = createAsyncThunk('bookings/confirmBooking', async 
     }
 });
 
+export const cancelBooking = createAsyncThunk('bookings/cancelBooking', async ({ bookingId, reason }, { rejectWithValue }) => {
+    try {
+        const response = await api.delete(`/staff/bookings/${bookingId}`, {
+            data: { reason }
+        });
+        return bookingId; // Return the booking Id to remove it from the state
+    } catch (error) {
+        console.error('Cancel booking error:', error.response?.data || error.message);
+        return rejectWithValue(error.response?.data || 'Failed to cancel booking');
+    }
+});
 
 const bookSlice = createSlice({
     name: 'bookings',
     initialState: {
-        bookings: [],                   // list of bookings
+        bookings: {                     // list of bookings
+            adminBookings: [],
+            staffBookings: [],
+            customerBookings: [],
+        },                   
         bookedHours: [],                 // list of booked hours
-        status: 'idle',                 // for fetchBookings and createBooking
+        status: {                          // for fetchBookings and createBooking
+            admin: 'idle',
+            staff: 'idle',
+            customer: 'idle',
+        },
+                        
         error: null,                    // for fetchBookings and createBooking
         bookedHoursStatus: 'idle',      // for fetchBookedHours
         bookedHoursError: null,         // for fetchBookedHours
         confirmStatus: 'idle',          // for confirmBooking
         confirmError: null,             // for confirmBooking
+        cancelStatus: 'idle',
     },
 
     reducers: {},
     extraReducers: (builder) => {
         builder
-            .addCase(fetchBookings.pending, (state) => {
-                state.status = 'loading';
+            // Admin 
+            .addCase(fetchAdminBookings.pending, (state) => {
+                state.status.admin = 'loading';
             })
 
-            .addCase(fetchBookings.fulfilled, (state, action) => {
-                state.status = 'succeeded';
-                state.bookings = action.payload;
+            .addCase(fetchAdminBookings.fulfilled, (state, action) => {
+                state.status.admin = 'succeeded';
+                state.bookings.adminBookings = action.payload;
             })
 
-            .addCase(fetchBookings.rejected, (state, action) => {
-                state.status = 'failed';
+            .addCase(fetchAdminBookings.rejected, (state, action) => {
+                state.status.admin = 'failed';
                 state.error = action.error.message;
             })
 
-            .addCase(createBooking. fulfilled, (state, action) => {
-                state.bookings.push(action.payload);
+            // Staff 
+            .addCase(fetchStaffBookings.pending, (state) => {
+                state.status.staff = 'loading';
+            })
+
+            .addCase(fetchStaffBookings.fulfilled, (state, action) => {
+                state.status.staff = 'succeeded';
+                state.bookings.staffBookings = action.payload;
+            })
+
+            .addCase(fetchStaffBookings.rejected, (state, action) => {
+                state.status.staff = 'failed';
+                state.error = action.error.message;
+            })
+
+            // Customer
+            .addCase(fetchBookings.pending, (state) => {
+                state.status.customer = 'loading';
+            })
+
+            .addCase(fetchBookings.fulfilled, (state, action) => {
+                state.status.customer = 'succeeded';
+                console.log('Fetched bookings:', action.payload);
+                state.bookings.customerBookings = action.payload;
+            })
+
+            .addCase(fetchBookings.rejected, (state, action) => {
+                state.status.customer = 'failed';
+                state.error = action.error.message;
+            })
+
+            .addCase(createBooking.fulfilled, (state, action) => {
+                state.bookings.customerBookings.push(action.payload);
             })
 
             .addCase(createBooking.rejected, (state, action) => {
@@ -111,9 +187,22 @@ const bookSlice = createSlice({
             .addCase(confirmBooking.rejected, (state, action) => {
                 state.confirmStatus = 'failed';
                 state.confirmError = action.payload;
+            })
+
+            .addCase(cancelBooking.pending, (state) => {
+                state.cancelStatus = 'loading';
+            })
+
+            .addCase(cancelBooking.fulfilled, (state, action) => {
+                state.cancelStatus = 'succeeded';
+                state.bookings = state.bookings.filter(booking => booking.booking_id !== action.payload);
+            })
+
+            .addCase(cancelBooking.rejected, (state, action) => {
+                state.cancelStatus = 'failed';
+                state.error = action.payload || action.error.message;
             });
     },
-
 });
 
 export default bookSlice.reducer;
