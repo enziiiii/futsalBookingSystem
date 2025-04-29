@@ -48,6 +48,9 @@ const schemas = {
         status: z.enum(["available", "booked", "maintenance", "closed"]).optional()
     })
 };
+
+
+
 const validateUser = (schema) => (req, res, next) => {
     const parseResult = schemas[schema].safeParse(req.body);
     if(!parseResult.success) { 
