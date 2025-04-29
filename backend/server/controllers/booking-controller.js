@@ -48,6 +48,7 @@ class BookingController {
         }
     }
 
+    // by customer
     async confirmBooking(req, res, next) {
         const { bookingId } = req.params;
         try {
@@ -68,6 +69,7 @@ class BookingController {
         }
     }
 
+    // by customer
     async cancelBooking(req, res, next) {
         const { bookingId } = req.params;
         const { reason } = req.body;
@@ -83,6 +85,7 @@ class BookingController {
         }
     }
 
+    // by customer
     async getMybookingsController(req, res, next) {
         try {
             if (!req.user || !req.user.userId) {
@@ -97,6 +100,33 @@ class BookingController {
             }
 
             handleResponse(res, 200, 'Bookings fetch successfully', bookings);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    // by staff abnd admin
+    async getAllBookingsController(req, res, next) {
+        const { startDate, endDate, courtId, status } = req.query;
+        try {
+            const filters = { startDate, endDate, courtId, status };
+            const bookings = await bookingModel.getBookings(filters);
+            handleResponse(res, 200, 'All bookings fetched successfully', bookings);
+        } catch (error) {
+            next (error);
+        }
+    }
+
+    // by staff
+    async updateBookingController(req, res, next) {
+        const { bookingId } = req.params;
+        const updates = req.body;
+        try {
+            const updatedBooking = await bookingModel.upateBooking(bookingId, updates);
+            if (!updatedBooking) {
+                return handleResponse(res, 404, 'Booking not found');
+            }
+            handleResponse(res, 200, 'Booking updated successfully', updatedBooking);
         } catch (error) {
             next(error);
         }
