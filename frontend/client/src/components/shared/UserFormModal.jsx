@@ -21,7 +21,7 @@ const UserFormModal = ({ user, role, onSave, onClose }) => {
     <div className="fixed z-10 inset-0 overflow-y-auto">
         <div className="flex items-center justify-center min-h-screen">
             <div className="bg-white rounded shadow p-4">
-                <h2 className="text-2xl mb-4">{isNew ? `Add New ${role === 'customer' ? 'Customer' : 'Staff'}` : 'Edit User'}</h2>
+                <h2 className="text-2xl mb-1">{isNew ? `Add New ${role === 'customer' ? 'Customer' : 'Staff'}` : 'Edit User'}</h2>
                 <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
                     <div>
                         <label htmlFor="username" className="block text-gray-700" >Username</label>
@@ -38,7 +38,7 @@ const UserFormModal = ({ user, role, onSave, onClose }) => {
                         <input 
                             type="text"
                             id="fullName"
-                            {...register('full_name', {required: 'Full Name is required' })}
+                            {...register('fullName', {required: 'Full Name is required' })}
                             className="w-full px-3 py-2 border rounded focus:outline-none focus:border-blue-500"
                         />
                         {errors.fullName && <span className="text-red-500">{errors.fullName.message}</span>}
@@ -66,7 +66,7 @@ const UserFormModal = ({ user, role, onSave, onClose }) => {
                         </select>
                         {errors.username && <span className="text-red-500">{errors.username.message}</span>}
                     </div>
-                    {isNew && (    // Add password for new users
+                    {/* {isNew && (    // Add password for new users
                         <div>
                             {console.log('Rendering password field for new user')}
                             <label htmlFor="password" className="block text-gray-700">Password</label>
@@ -90,7 +90,7 @@ const UserFormModal = ({ user, role, onSave, onClose }) => {
                             />
                             <small className="text-gray-500">Leave blank to keep the current password.</small>
                         </div>
-                    )}
+                    )} */}
                     <div>
                         <label htmlFor="phoneNumber" className="block text-gray-700" >Phone Number</label>
                         <input 
