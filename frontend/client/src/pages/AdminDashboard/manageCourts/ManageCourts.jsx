@@ -32,7 +32,7 @@ const ManageCourts = () => {
   return (
     <div className="p-4">
       <h2 className="text=2xl font-bold mb-4">Manage Courts</h2>
-        <Link to ="/admin/courts/add" className="bg-blue-500 text-white p-2 rounded mb-4 inline-block">Add New Court</Link>
+        <Link to ="/admin-dashboard/courts/add" className="bg-blue-500 text-white p-2 rounded mb-4 inline-block">Add New Court</Link>
         <table className="w-full border-collapse border">
           <thead>
             <tr>
@@ -53,7 +53,7 @@ const ManageCourts = () => {
                 <td className="border p2">{court.hourly_rate}</td>
                 <td className="border p2">{court.status}</td>
                 <td className="border p2">
-                  <Link to={`/admin/courts/${court.court_id}/edit`} className="bg-yellow-500 text-white p-1 mr-2 rounded">Edit</Link>
+                  <Link to={`/admin-dashboard/courts/${court.court_id}/edit`} className="bg-yellow-500 text-white p-1 mr-2 rounded">Edit</Link>
                   <button  onClick={() => handleDeleteCourt(court.court_id)} className="bg-red-500 text-white p-1 rounded">Delete</button>
                 </td>
               </tr>
