@@ -2,6 +2,8 @@ const express = require("express");
 const { protect, authorize } = require("../middlewares/authMiddleware");
 const courtController = require("../controllers/court-controller");
 const bookingController = require("../controllers/booking-controller");
+const userController = require("../controllers/user-controller");
+// const { changePassword } = require("../controllers/user-controller");
 const router = express.Router();
 
 // create a new booking
@@ -33,5 +35,9 @@ router.put('/bookings/:bookingId/confirm', protect, authorize(['customer']), boo
 
 // cancel booking
 router.put('/bookings/:bookingId/cancel', protect, authorize(['customer']), bookingController.cancelBooking);
+
+// change password
+router.post("/users/userId/change-password", protect, authorize(['customer']), userController.changePassword);
+
 
 module.exports = router;
