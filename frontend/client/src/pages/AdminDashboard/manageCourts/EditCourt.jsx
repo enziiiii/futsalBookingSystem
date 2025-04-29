@@ -28,7 +28,7 @@ const EditCourt = () => {
     e.preventDefault();
     const courtData = {court_name: courtName, location, hourly_rate: Number(hourlyRate), status };
     await dispatch(updateCourt({ courtId: parseInt(courtId), courtData })).unwrap();
-    navigate('/admin/courts');
+    navigate('/admin-dashboard/courts');
   };
 
   return (
