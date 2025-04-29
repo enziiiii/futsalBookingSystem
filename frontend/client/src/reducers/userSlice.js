@@ -4,8 +4,6 @@ import api from "../services/api";
 
 export const fetchUsersByRole = createAsyncThunk('users/fetchUsersByRole', async({ role }) => {
     const response = await api.get(`/admin/users?role=${role}`);
-    // console.log('API Response for:', response);     //Debug
-    // return response.data;
     console.log('From userSlice, Full API Response:', response);
     console.log('API Data:', response.data);
     return response.data.data; // Return the array inside the 'data' or Handle both response formats
@@ -26,19 +24,33 @@ export const addUser = createAsyncThunk('users/addUser', async (user) => {
 });
 
 export const updateUser = createAsyncThunk('users/updateUser', async ({ userId, user }) => {
-    const allowedFields = ["username", "fullName", "email", "passwordHash", "phoneNumber"];
+    const allowedFields = ["username", "fullName", "email", "phoneNumber"];
     const filteredUser = Object.fromEntries(
         Object.entries(user).filter(([key]) => allowedFields.includes(key))
     );
 
     console.log('From userSlice.js, Sending update data to API:', filteredUser);
     const response = await api.put(`admin/users/${userId}`, filteredUser);
-    return response.data;
+    return response.data.data;
 });
 
-export const deleteUser = createAsyncThunk('users/deleteUser', async (userId) => {
+export const deleteUser = createAsyncThunk('users/deleteUser', async (userId, { rejectWithValue }) => {
+   try {
     await api.delete(`/admin/users/${userId}`);
     return userId;
+   } catch (error) {
+    return rejectWithValue(error.response.data);
+   }
+});
+
+// to update roles
+export const updateUserRoles = createAsyncThunk('users/updateUserRoles', async ({ userId, roles }, { rejectWithValue }) => {
+    try {
+        const response = await api.put(`/admin/users/${userId}/roles`, { roles });
+        return response.data.data;
+    } catch (error) {
+        return rejectWithValue(error.response?.data || { message: 'Failed to updated roles' });
+    }
 });
 
 
@@ -61,9 +73,6 @@ const userSlice = createSlice({
                 state.status = 'Succeeded';
                 const { role } = action.meta.arg;           // Extract the rolepassed to the thunk
                 state.usersByRole[role] = action.payload;   // Store users under the respective role
-                // state.users = action.payload;
-                // state.users = Array.isArray(action.payload.data) ? action.payload : [];
-                // console.log('Assigned state.users for roel:', action.meta.arg.role, ':', state.users);     // debug
             })
 
             .addCase(fetchUsersByRole.rejected, (state, action) => {
@@ -77,14 +86,39 @@ const userSlice = createSlice({
             })
 
             .addCase(updateUser.fulfilled, (state, action) => {
-                const index = state.users.findIndex((user) => user.user_id === action.payload.user_id);
-                if (index !== -1) {
-                    state.users[index] = action.payload;
+                const updatedUser = action.payload;
+                for (const role in state.usersByRole) {
+                    const index = state.usersByRole[role]?.findIndex((user) => user.user_id === updatedUser.user_id);
+                    if (index !== -1) {
+                        state.usersByRole[index] = { ...state.usersByRole[role][index], ...updatedUser };
+                    }
                 }
+                state.status = 'succeeded';
+            })
+
+            .addCase(updateUser.rejected, (state, action) => {
+                state.status = 'failed';
+                state.error = action.error.message;
+            })
+
+            .addCase(updateUserRoles.fulfilled, (state, action) => {
+                const updatedUser = action.payload;
+                for ( const role in state.usersByRole) {
+                    state.usersByRole[role] = state.usersByRole[role].filter((user) => user.user_id !== updatedUser.user_id);
+                }
+                updatedUser.roles.forEach((role) => {
+                    if (!state.usersByRole[role]) {
+                        state.usersByRole[role] = [];
+                    }
+                    state.usersByRole[role].push(updatedUser);
+                });
             })
 
             .addCase(deleteUser.fulfilled, (state, action) => {
-                state.users = state.users.filter((user) => user.user_id !== action.payload);
+                const userId = action.payload;
+                for (const role in state.usersByRole) {
+                    state.usersByRole[role] = state.usersByRole[role].filter(user => user.user_id !== userId); 
+                }
             });
     },
 });
