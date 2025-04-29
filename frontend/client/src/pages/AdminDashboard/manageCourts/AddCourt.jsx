@@ -21,7 +21,7 @@ const AddCourt = () => {
       };
 
     await dispatch(addCourt(courtData)).unwrap();
-    navigate('/admin/courts');
+    navigate('/admin-dashboard/courts');
   };
 
   return (
