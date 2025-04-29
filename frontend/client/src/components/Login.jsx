@@ -13,6 +13,7 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -20,6 +21,9 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (loading) return;
+
+    setLoading(true);
     try {
       const response = await fetch("http://localhost:5000/api/auth/login", {
         method: 'POST',
@@ -42,11 +46,11 @@ const Login = () => {
         const decoded = jwtDecode(data.token);
         dispatch(loginSuccess(decoded));
         if (decoded.roles.includes('admin')) {
-          navigate('/admin-dashboard');
+          navigate('/admin');
         } else if (decoded.roles.includes('staff')) {
-          navigate('/staff-dashboard');
+          navigate('/staff');
         } else if (decoded.roles.includes('customer')) {
-          navigate('/customer-dashboard');
+          navigate('/customer');
         }
 
         localStorage.setItem('token', data.token);
@@ -104,7 +108,11 @@ const Login = () => {
             <Link to="/forgot-password" className="text-sm text-blue-500 hover:underline">Forgot Password?</Link>
             {/* <a href="/forgot-password" className="text-sm text-blue-500 hover:underline">Forgot Password?</a> */}
           </div>
-          <button type="submit" className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition duration-200">Login</button>
+          <button type="submit" className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition duration-200"
+          disabled={loading}
+          >
+            {loading ? 'logging in...' : 'Login'}
+          </button>
         </form>
         <div className="mt-4 text-center">
           <p className="text-gray-700">Don't have an account? <a href="/register" className="text-blue-500 hover:underline">Sign Up</a></p>
