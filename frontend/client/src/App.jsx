@@ -14,18 +14,19 @@ import AddCourt from './pages/AdminDashboard/manageCourts/AddCourt.jsx';
 import EditCourt from './pages/AdminDashboard/manageCourts/EditCourt.jsx';
 
 import NavLayout from './components/sharedLayout/NavLayout.jsx';
-import DashboardLayout from './components/sharedLayout/DashboardLayout.jsx';
 
 import ManageCustomers from './pages/AdminDashboard/manageUsers/ManageCustomers.jsx';
 import ManageStaffs from './pages/AdminDashboard/manageUsers/ManageStaffs.jsx';
-import ManageUsers from './pages/AdminDashboard/manageUsers/ManageUsers.jsx';
 import BookingForm from './pages/CustomerDashboard/BookingForm.jsx';
 import Court from './pages/CustomerDashboard/Court.jsx';
 import Payment from './pages/CustomerDashboard/Payment.jsx';
 import MyBookings from './pages/CustomerDashboard/MyBookings.jsx';
 import CourtAvailability from './pages/CustomerDashboard/CourtAvailability.jsx';
-
-
+import ManageBookings from './pages/AdminDashboard/manageBookings/ManageBookings.jsx';
+import StaffManageCustomers from './pages/StaffDashboard/manageUsers/StaffManageCustomers.jsx';
+import StaffManageBookings from './pages/StaffDashboard/StaffManageBookings.jsx';
+import StaffAnalyticsDashboard from './pages/StaffDashboard/StaffAnalyticsDashboard.jsx';
+import StaffCourtAvailability from './pages/StaffDashboard/StaffCourtAvailability.jsx';
 
 
 const App = () => {
@@ -39,34 +40,40 @@ const App = () => {
           <Route path="/register" element={<Register />} />
         </Route>
         
-        {/* Routes without navbar (post-login) */}
+        {/* Routes without navbar (post-login)
         <Route path="/admin-dashboard" element={<AdminDashboard />} />
         <Route path="/customer-dashboard" element={<CustomerDashboard />} />
-        <Route path="/staff-dashboard" element={<StaffDashboard />} />
+        <Route path="/staff-dashboard" element={<StaffDashboard />} /> */}
 
         {/* , Routes with UserNav (post-login dashboards) */}
-        <Route element={<DashboardLayout />}>
+        {/* <Route element={<DashboardLayout />}> */}
           {/* <Route path="/admin/profile" element={<AdminProfile />} /> */}
 
-          <Route path="/admin/courts" element={<ManageCourts />}  />
-          <Route path="admin/courts/add" element={<AddCourt />} />
-          <Route path="admin/courts/:courtId/edit" element={<EditCourt />} />
+          {/* Admin Dashboard */}
+          <Route path="/admin" element={<AdminDashboard />}>
+            <Route path="courts" element={<ManageCourts />}  />
+            <Route path="courts/add" element={<AddCourt />} />
+            <Route path="courts/:courtId/edit" element={<EditCourt />} />
+            <Route path="bookings" element={<ManageBookings />} />
+            <Route path="manageCustomers" element={<ManageCustomers />} />
+            <Route path="manageStaffs" element={<ManageStaffs />} />
+        </Route>
 
-          <Route path="/admin/users" element={<ManageUsers />} />
-          <Route path="/admin/manageCustomers" element={<ManageCustomers />} />
-          <Route path="/admin/manageStaffs" element={<ManageStaffs />} />
+        {/* Customer Dashboard */}
+        <Route path="/customer" element={<CustomerDashboard />}>
+          <Route path="courts" element={<Court />} />
+          <Route path="booking/:courtId" element={<BookingForm />} />
+          <Route path="payment/:bookingId" element={<Payment />} />
+          <Route path="myBookings" element={<MyBookings />} />
+          <Route path="courtAvailability" element={<CourtAvailability />} />
+        </Route>
 
-          {/* Customer routes */}
-          <Route path="/customer/courts" element={<Court />} />
-          <Route path="/customer/booking/:courtId" element={<BookingForm />} />
-          <Route path="/customer/payment/:bookingId" element={<Payment />} />
-          <Route path="/customer/myBookings" element={<MyBookings />} />
-          <Route path="/customer/courtAvailability" element={<CourtAvailability />} />
-          
-
-          {/* Staff routes */}
-          
-
+        <Route path="/staff" element={<StaffDashboard />}>
+          <Route path="customers" element={<StaffManageCustomers />} />
+          <Route path="bookings" element={<StaffManageBookings />} />
+          {/* <Route path="analytics" element={<StaffAnalyticsDashboard />} /> */}
+          <Route path="analytics" element={<StaffAnalyticsDashboard />} />
+          <Route path="court-availability" element={<StaffCourtAvailability />} />
         </Route>
       </Routes>
     </Router>
