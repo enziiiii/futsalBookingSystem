@@ -38,4 +38,7 @@ const connectDb = async () => {
     }
 };
 
-module.exports = { pool: startPool(), connectDb };
+module.exports = { 
+    pool: startPool(),
+    connectDb 
+};
