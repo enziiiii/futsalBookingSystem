@@ -144,17 +144,26 @@ const renewAccessToken = async (req, res, next) => {
 
 // special case for staff resource access
 const staffCourtAccess = async (req, res, next) => {
-    if (!req.user.roles.includes('staff')) return next();
+    try {
+        const courtId = req.params.courtId;
+        const staffId = req.user.userId;
 
-    const courtId = req.params.courtId || req.body.courtId;
-    const isAuthorized = await authService.verifyStaffAccess(
-        req.user.userId,
-        courtId
-    );
+        console.log('[Middleware] staffCourtAccess: staffId =', staffId, ', courtId =', courtId);
 
-    if (!isAuthorized) return next(new ForbiddenError("Not authorize for this court"));
+        const isAuthorized = await allModels.staffCourtModel.verifyStaffAccess(
+            staffId,
+            courtId
+        );
 
-    next();
+        console.log('[Middleware] staffCourtAccess: isAuthorized =', isAuthorized);
+    
+        if (!isAuthorized) return next(new ForbiddenError("Not authorize for this court"));
+    
+        next();
+    } catch (error) {
+        console.error('[Middleware] staffCourtAccess error:', error);
+        next(error);
+    }
 };
 
 module.exports = { 
